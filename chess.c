@@ -4,11 +4,12 @@
 #define KING	10
 #define QUEEN	9
 #define ROOK	5
-#define BISHOP	4
-#define KNIGHT	3
+#define KNIGHT	4
+#define BISHOP	3
 #define PAWN	1
+#define BLANK	0
 
-int a[10][10];			/* Board representation, white as positive, black as negative, blanks with zeroes */
+int a[12][12];			/* Board representation, white as positive, black as negative, blanks with zeroes */
 int moves[8][8];		/* List will represent possible calculated moves for a piece, probably should be a struct and should be local to take advantage of recursion at some point in future */
 
 /* 
@@ -27,17 +28,19 @@ int moves[8][8];		/* List will represent possible calculated moves for a piece, 
  */
 
 void initialise_board() {
-  for(int i = 0; i < 10; i++) {
-    for(int j = 0; j < 10; j++) {
-      if(i == 0 || j ==0 || i == 9 || j == 9)
+  for(int i = 0; i < 12; i++) {
+    for(int j = 0; j < 12; j++) {
+      if(i == 0 || i == 1 || j ==0 || j == 1 || i == 10 || j == 10 || i == 11 || j == 11)
 	a[i][j] = BORDER;
+      else
+	a[i][j] = EMPTY;
     }
   }
 }
 
 void show_board() {
-  for(int i = 1; i < 9; i++) {
-    for(int j = 1; j < 9; j++) 
+  for(int i = 2; i < 10; i++) {
+    for(int j = 2; j < 10; j++) 
       printf("%d\t",a[i][j]);
     printf("\n");
   }
