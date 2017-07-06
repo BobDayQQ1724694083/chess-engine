@@ -56,7 +56,12 @@ void show_board() {
   }
 }
 
+void read_fen() {
+  
+}
+
 int main() {
+  freopen("input.txt", "r", stdin);
   initialise_board();
   show_board();
   

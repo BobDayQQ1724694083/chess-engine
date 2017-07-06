@@ -1,14 +1,17 @@
 
-chess.c,256
+chess.cpp,322
 #define BORDER	3,20
 #define KING	4,38
 #define QUEEN	5,54
 #define ROOK	6,70
-#define BISHOP	7,85
-#define KNIGHT	8,102
+#define KNIGHT	7,85
+#define BISHOP	8,102
 #define PAWN	9,119
-int a[a11,135
-int moves[moves12,237
-void initialise_board(29,1542
-void show_board(38,1712
-int main(46,1850
+#define BLANK	10,134
+#define FULL 11,150
+int a[a13,169
+int moves[moves14,271
+void initialise_board(31,1576
+void show_board(42,1819
+void read_fen(59,2114
+int main(63,2138
