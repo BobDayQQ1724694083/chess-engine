@@ -12,7 +12,14 @@ using namespace std;
 #define FULL    1
 
 int a[12][12];			/* Board representation, white as positive, black as negative, blanks with zeroes */
-int moves[8][8];		/* List will represent possible calculated moves for a piece, probably should be a struct and should be local to take advantage of recursion at some point in future */
+
+typedef struct move {
+  int row;
+  int column;
+  struct move * next;
+}move;
+
+struct move *moves = NULL;
 
 /* 
    Just watch the sign of a piece, move in each direction you can until non-zeroes are obstructions, opposite signs are possible captures.
@@ -109,6 +116,85 @@ void read_fen() {
     }
   }
 }
+
+void moves_of_pawn(int row, int column) {
+  // intiliases linked list pointer *moves with list of moves that the pawn at (row,column) can make.
+  int sign = a[row][column] / (abs(a[row][column]));
+  switch(sign) {
+  case 1:
+    if(a[row - 1][column] == BLANK) {
+      move *p = (move *)malloc(size_of(move));
+      p->row = row - 1;
+      p->column = column;
+      p->next = moves;
+      moves = p;
+    }
+    if(sign != ((a[row - 1][column - 1] / (abs(a[row - 1][column - 1])))) && a[row - 1][column - 1] != BLANK) {
+      move *p = (move *)malloc(size_of(move));
+      p->row = row-1;
+      p->column = column-1;
+      p->next = moves;
+      moves = p;
+    }
+    if(sign != ((a[row - 1][column + 1] / (abs(a[row - 1][column + 1])))) && a[row - 1][column + 1] != BLANK) {
+      move *p = (move *)malloc(size_of(move));
+      p->row = row - 1;
+      p->column = column + 1;
+      p->next = moves;
+      moves = p;
+    }
+    break;
+  case -1:
+    if(a[row + 1][column] == BLANK) {
+      move *p = (move *)malloc(size_of(move));
+      p->row = row + 1;
+      p->column = column;
+      p->next = moves;
+      moves = p;
+    }
+    if(sign != ((a[row + 1][column - 1] / (abs(a[row + 1][column - 1])))) && a[row + 1][column - 1] != BLANK) {
+      move *p = (move *)malloc(size_of(move));
+      p->row = row-1;
+      p->column = column-1;
+      p->next = moves;
+      moves = p;
+    }
+    if(sign != ((a[row + 1][column + 1] / (abs(a[row + 1][column + 1])))) && a[row + 1][column + 1] != BLANK) {
+      move *p = (move *)malloc(size_of(move));
+      p->row = row + 1;
+      p->column = column + 1;
+      p->next = moves;
+      moves = p;
+    }
+    break;
+  }
+}
+
+void moves_of_bishop(int row, int column) {
+  // intiliases linked list pointer *moves with list of moves that the bishop at (row,column) can make.
+  int sign = a[row][column] / (abs(a[row][column]));
+}
+
+void moves_of_knight(int row, int column) {
+  // intiliases linked list pointer *moves with list of moves that the knight at (row,column) can make.
+  int sign = a[row][column] / (abs(a[row][column]));
+}
+
+void moves_of_rook(int row, int column) {
+  // intiliases linked list pointer *moves with list of moves that the rook at (row,column) can make.
+  int sign = a[row][column] / (abs(a[row][column]));
+}
+
+void moves_of_queen(int row, int column) {
+  // intiliases linked list pointer *moves with list of moves that the queen at (row,column) can make.
+  int sign = a[row][column] / (abs(a[row][column]));
+}
+
+void moves_of_king(int row, int column) {
+  // intiliases linked list pointer *moves with list of moves that the king at (row,column) can make.
+  int sign = a[row][column] / (abs(a[row][column]));
+}
+
 
 int main() {
   freopen("input.txt", "r", stdin);
