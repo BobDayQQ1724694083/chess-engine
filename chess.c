@@ -8,6 +8,7 @@
 #define BISHOP	3
 #define PAWN	1
 #define BLANK	0
+#define FULL    1
 
 int a[12][12];			/* Board representation, white as positive, black as negative, blanks with zeroes */
 int moves[8][8];		/* List will represent possible calculated moves for a piece, probably should be a struct and should be local to take advantage of recursion at some point in future */
@@ -33,16 +34,25 @@ void initialise_board() {
       if(i == 0 || i == 1 || j ==0 || j == 1 || i == 10 || j == 10 || i == 11 || j == 11)
 	a[i][j] = BORDER;
       else
-	a[i][j] = EMPTY;
+	a[i][j] = BLANK;
     }
   }
 }
 
 void show_board() {
-  for(int i = 2; i < 10; i++) {
-    for(int j = 2; j < 10; j++) 
+  if (FULL) {
+    for(int i = 0; i < 12; i++) {
+     for(int j = 0; j < 12; j++) 
       printf("%d\t",a[i][j]);
     printf("\n");
+   }
+  }
+  else {
+    for(int i = 2; i < 10; i++) {
+      for(int j = 2; j < 10; j++) 
+	printf("%d\t",a[i][j]);
+      printf("\n");
+    }
   }
 }
 
