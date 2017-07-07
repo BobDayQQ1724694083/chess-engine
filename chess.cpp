@@ -1,16 +1,15 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define BORDER	42
-#define FULL    1
+// macros for pieces
 #define KING	10
 #define QUEEN	9
 #define ROOK	5
 #define KNIGHT	4
 #define BISHOP	3
 #define PAWN	1
-#define BLANK	0
 
+// macros for directions
 #define NORTH		1
 #define NORTH_EAST	2
 #define EAST		3
@@ -20,6 +19,10 @@ using namespace std;
 #define WEST		7
 #define NORTH_WEST	8
 
+// macros for board configurations
+#define BORDER		42
+#define BLANK		0
+#define SHOW_BORDER	1
 
 
 int a[12][12];			/* Board representation, white as positive, black as negative, blanks with zeroes */
@@ -27,7 +30,7 @@ int a[12][12];			/* Board representation, white as positive, black as negative, 
 typedef struct move {
   int row;
   int column;
-  struct move * next;
+  struct move *next;
 }move;
 
 struct move *moves = NULL;
@@ -59,7 +62,7 @@ void initialise_board() {
 }
 
 void show_board() {
-  if (FULL) {
+  if (SHOW_BORDER) {
     for(int i = 0; i < 12; i++) {
       for(int j = 0; j < 12; j++) 
 	printf("%d\t",a[i][j]);
@@ -77,6 +80,7 @@ void show_board() {
 
 void read_fen() {
   string str;
+  // scanf("%s\n",str);
   cin >> str;
   // cout << endl << str << endl;
   int counter = 1;
@@ -146,7 +150,7 @@ void show_moves() {
 }
 
 void push_move(int rownum, int colnum) {
-  if (a[rownum][colnum] == BORDER)
+  if (a[rownum][colnum] == BORDER) // discard invalid moves
     return;
   move *temp = (move *)malloc(size_of(move));
   temp -> row = rownum - 1;
@@ -155,8 +159,29 @@ void push_move(int rownum, int colnum) {
   moves = p;
 }
 
+void change_row_column(int *row, int *column, int *direction) {
+  switch(*direction) {
+  case NORTH: (*row)--;
+    break;
+  case SOUTH: (*row)++;
+    break;
+  case EAST: (*column)++;
+    break;
+  case WEST: (*column)--;
+    break;
+  case NORTH_EAST: (*row)--; (*column)++;
+    break;
+  case NORTH_WEST: (*row)--; (*column)--;
+    break;
+  case SOUTH_EAST: (*row)++; (*column)++;
+    break;
+  case SOUTH_WEST: (*row)++; (*column)--;
+    break;
+  }
+}
+
 void move_in_direction(int row, int column, int direction) {
-  // This function is designed to be used for bishops, rooks, and queens.
+  // This function is designed to be used for bishops, rooks and queens.
   if(a[row][column] > 0) {	// if piece is white
     while(a[row][column] != BORDER) {
       if(a[row][column] > 0)	// break if piece was of same color
@@ -164,24 +189,7 @@ void move_in_direction(int row, int column, int direction) {
       push_move(row, column);
       if(a[row][column] < 0)	// break if piece was of opposite color
 	break;
-      switch(direction) {
-      case NORTH: row--;
-	break;
-      case SOUTH: row++;
-	break;
-      case EAST: column++;
-	break;
-      case WEST: column--;
-	break;
-      case NORTH_EAST: row--; column++;
-	break;
-      case NORTH_WEST: row--; column--;
-	break;
-      case SOUTH_EAST: row++; column++;
-	break;
-      case SOUTH_WEST: row++; column--;
-	break;
-      }
+      change_row_column(&row, &column, &direction); // move to next position
     }
   }
   else {			// else piece is black
@@ -191,29 +199,13 @@ void move_in_direction(int row, int column, int direction) {
       push_move(row, column);
       if(a[row][column] > 0)	// break if piece was of opposite color
 	break;
-      switch(direction) {
-      case NORTH: row--;
-	break;
-      case SOUTH: row++;
-	break;
-      case EAST: column++;
-	break;
-      case WEST: column--;
-	break;
-      case NORTH_EAST: row--; column++;
-	break;
-      case NORTH_WEST: row--; column--;
-	break;
-      case SOUTH_EAST: row++; column++;
-	break;
-      case SOUTH_WEST: row++; column--;
-	break;
-      }
+      change_row_column(&row, &column, &direction); // move to next position
     }
   }
 }
 
 void move_diagonally(int row, int column) {
+  // This function is designed to be used for bishops and queens.
   move_in_direction(row, column, NORTH_EAST);
   move_in_direction(row, column, SOUTH_EAST);
   move_in_direction(row, column, SOUTH_WEST);
@@ -221,6 +213,7 @@ void move_diagonally(int row, int column) {
 }
 
 void move_straight(int row, int column) {
+  // This function is designed to be used for rooks and queens.
   move_in_direction(row, column, NORTH);
   move_in_direction(row, column, EAST);
   move_in_direction(row, column, SOUTH);
@@ -229,6 +222,7 @@ void move_straight(int row, int column) {
 
 void moves_of_pawn(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the pawn at (row,column) can make.
+  // make an improvement to make pawns run fast from their initial positions
   if(a[row][column] != PAWN)
     return;
   clear_moves();
@@ -243,9 +237,9 @@ void moves_of_pawn(int row, int column) {
   else {			// else piece is black
     if(a[row + 1][column] == BLANK)
       push_move(row + 1, colummn);
-    if(a[row + 1][column - 1] < 0 && a[row + 1][column - 1] != BLANK)
+    if(a[row + 1][column - 1] > 0 && a[row + 1][column - 1] != BLANK)
       push_move(row + 1, colummn - 1);
-    if(a[row + 1][column + 1] < 0 && a[row + 1][column + 1] != BLANK)
+    if(a[row + 1][column + 1] > 0 && a[row + 1][column + 1] != BLANK)
       push_move(row + 1, colummn + 1);
   }
 }
@@ -361,7 +355,6 @@ void moves_of_king(int row, int column) {
       push_move(row + 1, column + 1);
   }
 }
-
 
 int main() {
   freopen("input.txt", "r", stdin);
