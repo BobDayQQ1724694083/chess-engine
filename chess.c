@@ -24,7 +24,7 @@
 #define INVALID		42
 #define BOARD_SIZE	12
 #define BLANK		0
-#define SHOW_BORDER	1
+#define SHOW_VALUES	0
 
 
 int board[BOARD_SIZE][BOARD_SIZE]; /* Board representation, white as positive, black as negative, blanks with zeroes */
@@ -63,8 +63,27 @@ void initialise_board() {
   }
 }
 
+char pretty_print(int piece) {
+  switch(piece) {
+  case INVALID:		return 'X';
+  case BLANK:		return '.';
+  case PAWN:		return 'P';
+  case BISHOP:		return 'B';
+  case KNIGHT:		return 'N';
+  case ROOK:		return 'R';
+  case QUEEN:		return 'Q';
+  case KING:		return 'K';
+  case -PAWN:		return 'p';
+  case -BISHOP:		return 'b';
+  case -KNIGHT:		return 'n';
+  case -ROOK:		return 'r';
+  case -QUEEN:       	return 'q';
+  case -KING:		return 'k';
+  }
+}
+
 void show_board() {
-  if (SHOW_BORDER) {
+  if (SHOW_VALUES) {
     for(int i = 0; i < BOARD_SIZE; i++) {
       for(int j = 0; j < BOARD_SIZE; j++) 
 	printf("%d\t",board[i][j]);
@@ -72,17 +91,34 @@ void show_board() {
     }
   }
   else {
+    /* make something that will show kill, that is places that are on moves list acc. to level of some macro */
+    printf("\n   ");
+    for(int i = 2; i < (BOARD_SIZE - 2); i++)
+      printf("%c  ", (i+95));
+    printf("\n  ");
+    for(int i = 2; i < 14; i++)
+      printf("--");
+    printf("\n");
     for(int i = 2; i < (BOARD_SIZE - 2); i++) {
-      for(int j = 2; j < (BOARD_SIZE - 2); j++) 
-	printf("%d\t",board[i][j]);
-      printf("\n");
+      printf("%d |", 10 - i);
+      for(int j = 2; j < (BOARD_SIZE - 2); j++)
+	printf("%c| ",pretty_print(board[i][j]));
+      printf("%d\n", 10 - i);
     }
+    printf("  ");
+    for(int i = 2; i < (BOARD_SIZE - 2); i++)
+      printf("---");
+    printf("\n   ");
+    for(int i = 2; i < (BOARD_SIZE - 2); i++)
+      printf("%c  ", (i+95));
   }
 }
 
 void read_fen() {
+  // make macro for showing FEN, shift all additional verbosity onto macros
   char str[64];
   fgets(str, 64, stdin);
+  fprintf(stdout, "FEN: %s", str);
   for (int i = 0, row = 2, column = 2; i < strlen(str); i++ ) {
     char ch = str[i];
     if(ch == '/') {
@@ -121,7 +157,7 @@ void read_fen() {
 	break;
       }
     }
-    else {
+    else if(ch >=48 && ch <= 58) {
       int n = ch - 48;
       while(n != 0) {
 	board[row][column++] = BLANK;
@@ -141,10 +177,12 @@ void clear_moves() {
 }
 
 void show_moves() {
+  /* make a macro to toggle between actual values and pretty values */
   move *temp = moves;
-  printf("\n");
+  if(temp != NULL)
+    printf("\nmoves: ");
   while(temp != NULL) {
-    printf("%d-%d ", temp -> row, temp -> column);
+    printf("%d-%d ",(temp -> column) - 1, (temp -> row) - 1);
     temp = temp -> next;
   }
 }
@@ -152,8 +190,8 @@ void show_moves() {
 void push_move(int rownum, int colnum) {
   if (board[rownum][colnum] == INVALID) // discard invalid moves
     return;
-  move *temp = (move *)malloc(size_of(move));
-  temp -> row = rownum - 1;
+  move *temp = (move *)malloc(sizeof(move));
+  temp -> row = rownum;
   temp -> column = colnum;
   temp -> next = moves;
   moves = temp;
@@ -192,7 +230,7 @@ void move_in_direction(int row, int column, int direction) {
       change_row_column(&row, &column, &direction); // move to next position
     }
   }
-  else {			// else piece is black
+  else if(board[row][column] < 0) {     // else piece is black
     while(board[row][column] != INVALID) {
       if(board[row][column] < 0)	// break if piece was of same color
 	break;
@@ -234,7 +272,7 @@ void moves_of_pawn(int row, int column) {
     if(board[row - 1][column + 1] < 0  && board[row - 1][column + 1] != BLANK)
       push_move(row - 1, column + 1);
   }
-  else {			// else piece is black
+  else if(board[row][column] < 0) {			// else piece is black
     if(board[row + 1][column] == BLANK)
       push_move(row + 1, column);
     if(row == 3 && board[row + 2][column] == BLANK) /* initial case for a pawn */
@@ -273,7 +311,7 @@ void moves_of_knight(int row, int column) {
     if(board[row + 2][column + 1] == BLANK || board[row + 2][column + 1] < 0)
       push_move(row + 2, column + 1);
   }
-  else {			// else piece is black
+  else if(board[row][column] < 0) {			// else piece is black
     if(board[row - 1][column - 2] == BLANK || board[row - 1][column - 2] > 0)
       push_move(row - 1, column - 2);
     if(board[row - 1][column + 2] == BLANK || board[row - 1][column + 2] > 0)
@@ -328,7 +366,7 @@ void moves_of_king(int row, int column) {
     if(board[row + 1][column + 1] == BLANK || board[row + 1][column + 1] < 0)
       push_move(row + 1, column + 1);
   }
-  else {			// else piece is black
+  else if(board[row][column] < 0) {			// else piece is black
     if(board[row - 1][column] == BLANK || board[row - 1][column] > 0)
       push_move(row - 1, column);
     if(board[row - 1][column - 1] == BLANK || board[row - 1][column - 1] > 0)
@@ -348,11 +386,21 @@ void moves_of_king(int row, int column) {
   }
 }
 
+void solve() {
+  int x = 7;
+  int y = 4;
+  moves_of_pawn(x+1, y+1);
+  show_moves();
+  puts("");
+}
+
 int main() {
   freopen("input.txt", "r", stdin);
   initialise_board();
   read_fen();
 
+  solve();
+    
   show_board();
   return 1;
 }
