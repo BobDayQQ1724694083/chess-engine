@@ -227,6 +227,8 @@ void moves_of_pawn(int row, int column) {
   if(board[row][column] > 0) {	// if piece is white
     if(board[row - 1][column] == BLANK) 
       push_move(row - 1, column);
+    if(row == 8 && board[row - 2][column] == BLANK) /* initial case for a pawn */
+      push_move(row - 2, column);
     if(board[row - 1][column - 1] < 0 && board[row - 1][column - 1] != BLANK)
       push_move(row - 1, column - 1);
     if(board[row - 1][column + 1] < 0  && board[row - 1][column + 1] != BLANK)
@@ -235,6 +237,8 @@ void moves_of_pawn(int row, int column) {
   else {			// else piece is black
     if(board[row + 1][column] == BLANK)
       push_move(row + 1, column);
+    if(row == 3 && board[row + 2][column] == BLANK) /* initial case for a pawn */
+      push_move(row + 2, column);
     if(board[row + 1][column - 1] > 0 && board[row + 1][column - 1] != BLANK)
       push_move(row + 1, column - 1);
     if(board[row + 1][column + 1] > 0 && board[row + 1][column + 1] != BLANK)
