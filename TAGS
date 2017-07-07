@@ -1,5 +1,47 @@
 
-chess.cpp,322
+chess.cpp,1008
+#define KING	5,68
+#define QUEEN	6,84
+#define ROOK	7,100
+#define KNIGHT	8,115
+#define BISHOP	9,132
+#define PAWN	10,149
+#define NORTH	13,190
+#define NORTH_EAST	14,207
+#define EAST	15,228
+#define SOUTH_EAST	16,244
+#define SOUTH	17,265
+#define SOUTH_WEST	18,282
+#define WEST	19,303
+#define NORTH_WEST	20,319
+#define BORDER	23,376
+#define BLANK	24,395
+#define SHOW_BORDER	25,412
+int a[a28,436
+typedef struct move 30,539
+  int row;31,561
+  int column;32,572
+  struct move *next;next33,586
+}move;move34,607
+struct move *moves moves36,615
+void initialise_board(53,1760
+void show_board(64,2003
+void read_fen(81,2304
+void clear_moves(135,3448
+void show_moves(144,3583
+void push_move(152,3742
+void move_in_direction(162,3971
+void move_diagonally(220,5371
+void move_straight(227,5602
+void moves_of_pawn(234,5809
+void moves_of_bishop(257,6684
+void moves_of_knight(265,6929
+void moves_of_rook(308,8960
+void moves_of_queen(316,9197
+void moves_of_king(325,9471
+int main(370,11507
+
+chess.cpp~,322
 #define BORDER	3,20
 #define KING	4,38
 #define QUEEN	5,54
@@ -15,3 +57,15 @@ void initialise_board(31,1576
 void show_board(42,1819
 void read_fen(59,2114
 int main(63,2138
+
+LICENSE.md,16
+Copyright 3,13
+
+README.md,46
+This is a relatively simple chess engine,1,0
+
+input.txt~,0
+
+input.txt,0
+
+a.out,0

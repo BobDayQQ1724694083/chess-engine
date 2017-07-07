@@ -1,0 +1,1307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><script async="" src="Pawn_moves_files/analytics.js"></script><script async="" src="Pawn_moves_files/analytics.js"></script><script src="Pawn_moves_files/jquery1.js"></script>
+<script src="Pawn_moves_files/jquery-ui.js"></script>
+
+
+ 
+<script src="Pawn_moves_files/google_analytics.js"></script>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  ga('create', 'UA-52806117-1', 'auto');
+	  ga('send', 'pageview');
+</script>
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>TCS: CodeVita - Coding Arena</title>
+
+<link rel="stylesheet" href="Pawn_moves_files/structure.css" type="text/css">
+<link rel="stylesheet" href="Pawn_moves_files/style.css" type="text/css">
+<link rel="stylesheet" href="Pawn_moves_files/jquery-ui-1.css">
+
+<script>
+	$(function() {
+		var radio_val = '3';
+		if (radio_val == '') {
+			radio_val = 0;
+		}
+		$("#tabs").tabs({
+			active : radio_val
+		});
+	});
+	window.history.forward();
+	function noBack() {
+		window.history.forward();
+	}
+</script>
+<script language="JavaScript">
+	var eventdate = new Date("December 25, 2013 23:59:59");
+	var d = new Date("December 25, 2013 23:59:59");
+	function toSt(n) {
+		s = ""
+		if (n < 10)
+			s += "0"
+		return s + n.toString();
+	}
+
+	function countdown1(s, d1) {
+		var e = document.getElementById("refreshed");
+		if (e.value == "no")
+			e.value = "yes";
+		else {
+			e.value = "no";
+			location.reload();
+		}
+
+		eventdate = new Date(s);
+		d = new Date(d1);
+		count = Math.floor((eventdate.getTime() - d.getTime()) / 1000);
+		if (count <= 0) {
+			$('#sec').html("00");
+			$('#min').html("00");
+			$('#hr').html("00");
+			return;
+		}
+		$('#sec').html(toSt(count % 60));
+		count = Math.floor(count / 60);
+		$('#min').html(toSt(count % 60));
+		count = Math.floor(count / 60);
+		$('#hr').html(toSt(count % 24));
+		setTimeout("countdown(d)", 999);
+	}
+
+	function countdown(d) {
+		d.setSeconds(d.getSeconds() + 1);
+		count = Math.floor((eventdate.getTime() - d.getTime()) / 1000);
+		if (count <= 0) {
+			$('#sec').html("00");
+			$('#min').html("00");
+			$('#hr').html("00");
+			return;
+		}
+		$('#sec').html(toSt(count % 60));
+		count = Math.floor(count / 60);
+		$('#min').html(toSt(count % 60));
+		count = Math.floor(count / 60);
+		$('#hr').html(toSt(count % 24));
+		setTimeout("countdown(d)", 999);
+	}
+// end hiding script-->
+</script>
+
+<style>
+/* menu style */
+td.third {
+	padding: 11.5px;
+	width: auto;
+	line-height: 2.5em;
+}
+
+td.third:hover:not(.active)  {
+	padding: 11.5px;
+	width: auto;
+	line-height: 2.5em;
+	background-color: #ddd;
+	border-radius: 15px;
+	
+}
+
+a:hover:not(.active) {
+   color: #065694;
+}
+
+td.active {
+	background: #fcdd41;
+	 border-radius: 15px;
+}
+
+td.active a {
+	color: #065694;
+	font-weight: 900;
+}
+</style>
+</head>
+<body onload="countdown1('July 7, 2017 15:0:0','July 7, 2017 10:35:43')">
+	<table border="0" align="center">
+		<tbody><tr>
+			<td>
+				<div>
+					<div class="links">
+						<table class="innerlinks" border="0">
+							<tbody><tr>
+								<td>
+									<!-- <a class="upperlinks" href="/CodevitaV6/redirectToNextStep.jsp" target="_blank" >TCS NextStep</a>&nbsp&nbsp&nbsp
+		<a class="upperlinks" href="/CodevitaV6/redirectToTCSCareers.jsp" target="_blank" >TCS Careers</a>&nbsp&nbsp&nbsp
+		<a class="upperlinks" href="/CodevitaV6/redirectToTCS.jsp" target="_blank" >www.tcs.com</a>&nbsp&nbsp&nbsp<br> -->
+									<a class="upperlinks" href="https://nextstep.tcs.com/" target="_blank">TCS NextStep</a>&nbsp;&nbsp;&nbsp; <a class="upperlinks" href="http://www.careers.tcs.com/" target="_blank">TCS Careers</a>&nbsp;&nbsp;&nbsp; <a class="upperlinks" href="http://www.tcs.com/Pages/default.aspx" target="_blank">www.tcs.com</a>&nbsp;&nbsp;&nbsp;<br>
+								</td>
+								<td style="text-align: right"><a style="font-family: Verdana; font-size: 11px; font-weight: bold; color: black;" href="https://www.tcscodevita.com/CodevitaV6/logout.jsp">Logout</a></td>
+							</tr>
+						</tbody></table>
+					</div>
+					<div class="tcsclip">
+						<img src="Pawn_moves_files/header.jpg" width="978px" height="115px" border="0">
+					</div>
+					<div class="tags">
+						<table class="all" width="100%" border="0">
+							<tbody><tr>
+								<td class="first">
+									<table class="welcome" border="0">
+										<tbody><tr>
+											<td width="23px"></td>
+											<td width="75%" align="left"><a class="navigationlink">Welcome
+													RAJAT PUNDIR</a></td>
+											<td class="third" width="20%" align="center"><a class="navigationlink" href="https://www.tcscodevita.com/CodevitaV6/guidelines.jsp">Home</a></td>
+										</tr>
+									</tbody></table>
+								</td>
+								<td class="third active" align="center"><a class="navigationlink" href="https://www.tcscodevita.com/CodevitaV6/StartCoding">Coding
+										Arena</a></td>
+								<td class="third" align="center"><a class="navigationlink" href="https://www.tcscodevita.com/CodevitaV6/ChkExecuteServlet">Compile &amp; Run </a></td>
+								<td class="third" align="center"><a class="navigationlink" href="https://www.tcscodevita.com/CodevitaV6/ChkSubmissionServlet">Submissions</a></td>
+								<td class="third" align="center"><a class="navigationlink" href="javascript:launchReport();">Graphs</a></td>
+
+								<td class="third" align="center"><a class="navigationlink" href="https://www.tcscodevita.com/CodevitaV6/feedback.jsp">Feedback</a></td>
+
+								
+							</tr>
+						</tbody></table>
+
+					</div>
+					<table class="main" border="0">
+						<tbody><tr>
+							<td width="23px"></td>
+
+
+							<td valign="top">
+								<!-- 	<div class="leftupper" >	 -->
+								<table style="border-collapse: collapse;" border="0">
+									<tbody><tr>
+										<td height="10px"></td>
+									</tr>
+									<tr>
+										<td width="200px"><a class="title"><b>Coding
+													Arena </b></a><br>
+													</td>
+										<td width="390px"></td>
+										<td align="left"><img src="Pawn_moves_files/Codevita-logo-small.jpg" width="172px" height="45px" border="0"><br>
+											<select style="margin: 7px;" name="defaultlang" onchange="updateDefaultLang()">
+												<option value="">Change Default Language</option>
+												<option value=".c" selected="selected">C</option>
+												<option value=".cpp">CPP</option>
+												<option value=".cs">C sharp</option>
+												<option value=".java7">Java 7</option>
+												<option value=".java8">Java 8</option>
+												<option value=".js">Java Script</option>
+												<option value=".pl">Perl</option>
+												<option value=".php">Php</option>
+												<option value=".py2">Python 2</option>
+												<option value=".py3">Python 3</option>
+												<option value=".rb">Ruby</option>
+											</select>
+											</td>
+										<td>
+											<table style="border-collapse: collapse;" width="100%" height="10%" border="0">
+
+												<tbody><tr>
+													<td style="background-color: gray" height="22px"><a class="timenotif"><b>Time Left</b></a></td>
+												</tr>
+												<tr>
+													<td style="background-color: #EFEFEF;" width="172px" height="60px">
+														<table width="172px" cellspacing="0" border="0">
+															<tbody><tr>
+																<td width="20px"></td>
+																<td style="background-color: white;" width="10%"><a style="font-size: 24px; color: #950000; font-weight: bold;" id="hr">04</a></td>
+																<td width="20px"></td>
+																<td style="background-color: white;" width="10%"><a style="font-size: 24px; color: #950000; font-weight: bold;" id="min">18</a></td>
+																<td width="20px"></td>
+																<td style="background-color: white;" width="10%"><a style="font-size: 24px; color: #950000; font-weight: bold;" id="sec">45</a></td>
+																<td width="20px"></td>
+															</tr>
+															<tr>
+																<td width="20px"></td>
+																<td align="center">hr</td>
+																<td width="20px"></td>
+																<td align="center">min</td>
+																<td width="20px"></td>
+																<td align="center">sec</td>
+																<td width="20px"></td>
+															</tr>
+														</tbody></table>
+													</td>
+												</tr>
+
+											</tbody></table>
+										</td>
+
+									</tr>
+									<tr>
+										<td height="10px"></td>
+									</tr>
+								</tbody></table>  
+<div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+	<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">
+		<li class="ui-helper-edit  ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-1" aria-labelledby="ui-id-1" aria-selected="false"><a href="#tabs-1" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-1">A</a></li>
+		<li class="ui-helper-edit  ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-2" aria-labelledby="ui-id-2" aria-selected="false"><a href="#tabs-2" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-2">B</a></li>
+		<li class="ui-helper-edit  ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-3" aria-labelledby="ui-id-3" aria-selected="false"><a href="#tabs-3" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-3">C</a></li>
+		<li class="ui-helper-edit  ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab" tabindex="0" aria-controls="tabs-4" aria-labelledby="ui-id-4" aria-selected="true"><a href="#tabs-4" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-4">D</a></li>
+		<li class="ui-helper-edit  ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-5" aria-labelledby="ui-id-5" aria-selected="false"><a href="#tabs-5" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-5">E</a></li>
+		<li class="ui-helper-edit  ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-6" aria-labelledby="ui-id-6" aria-selected="false"><a href="#tabs-6" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-6">F</a></li>
+		<li class="ui-helper-edit  ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-7" aria-labelledby="ui-id-7" aria-selected="false"><a href="#tabs-7" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-7">G</a></li>
+		<li class="ui-helper-edit  ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-8" aria-labelledby="ui-id-8" aria-selected="false"><a href="#tabs-8" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-8">H</a></li>
+
+	</ul>
+	
+	<div id="tabs-1" aria-labelledby="ui-id-1" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none;" aria-expanded="false" aria-hidden="true">
+		<table>
+			<tbody><tr>
+				<td width="800px" valign="top">
+					<div class="border">
+						<div class="Section1">
+				<p class="MsoNormal" style="text-align:left" align="center"><b style="mso-bidi-font-weight:
+				normal"><span class="problem">Problem : Chakravyuha<o:p></o:p></span></b></p>
+				
+				<p class="MsoNormal"><span style="font-family:Verdana"><o:p> </o:p></span></p>
+				
+				
+				
+				<p class="MsoNormal"><o:p> </o:p></p>
+				
+				<p class="MsoNormal"><span style="font-family:Verdana">During the 
+battle of Mahabharat, when Arjuna was far away in the battlefield, Guru 
+Drona made a Chakravyuha formation of the Kaurava army to capture 
+Yudhisthir Maharaj. Abhimanyu, young son of Arjuna was the only one 
+amongst the remaining Pandava army who knew how to crack the 
+Chakravyuha. He took it upon himself to take the battle to the enemies.
+				<br><br>
+				
+				<o:p></o:p></span></p>
+			</div>
+						<table>
+							<tbody><tr>
+								<td>
+									<form action="/CodevitaV6/StartProblem" method="post">
+										<input name="radio" value="A" type="hidden"> <a href="#tabs-1"><input src="Pawn_moves_files/View-prblm-bttn.jpg" name="View" type="image"></a>
+									</form>
+								</td>
+								<td width="200px"></td>
+							</tr>
+						</tbody></table>
+					</div>
+				</td>
+				<td valign="top" height="10%">
+
+
+					<div class="rightmain">
+						<table style="border-collapse: collapse;" width="100%" height="10%" border="0">
+
+
+							<tbody><tr>
+								<td style="background-color: #D3D3D3; height: 22px"><a href="https://www.tcscodevita.com/CodevitaV6/guidelines.jsp" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Rules
+										&amp; Regulations</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+							</tr><tr>
+								<td style="background-color: gray; height: 22px; width: 172px"><a href="javascript:alert1();" title="Enable after View Full Problem click" style="color: #ffffff; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Launch
+										Code Editor</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/Notifications" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Notifications</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/statusmessages.pdf" download="" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Status
+										Messages</a></td>
+							</tr>
+
+
+							<tr>
+								<td>
+									<div style="height: 100px; position: relative;"></div>
+								</td>
+							</tr>
+						</tbody></table>
+					</div>
+
+				</td>
+			</tr>
+		</tbody></table>
+
+
+
+
+	</div>
+
+	
+	
+	<div id="tabs-2" aria-labelledby="ui-id-2" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none;" aria-expanded="false" aria-hidden="true">
+		<table>
+			<tbody><tr>
+				<td width="800px" valign="top">
+
+					<div class="border">
+						<div class="Section1">
+							<p class="MsoNormal" style="text-align: left" align="center">
+								<b style="mso-bidi-font-weight: normal"><span class="problem">Problem : The Vita Sum<o:p></o:p></span></b>
+							</p>
+
+							<p class="MsoNormal">
+								<span style="font-family: Verdana"><o:p>
+									</o:p></span>
+							</p>
+
+
+
+							<p class="MsoNormal">
+								<o:p>
+								</o:p>
+							</p>
+
+							<p class="MsoNormal">
+								<span style="font-family: Verdana">Tom the cat is brushing up 
+his Math skills. He has a bag containing N balls of different colors. 
+Now Tom can randomly pick any even number of balls from the bag.  Tom 
+wants to find out the sum of all such combinations of balls that he can 
+pull out from the bag. Given he can pull out at max K balls in one pick.
+								<br><o:p></o:p>
+								</span>
+							</p>
+						</div>
+						<table>
+							<tbody><tr>
+								<td>
+									<form action="/CodevitaV6/StartProblem" method="post">
+										<input name="radio" value="B" type="hidden"> <a href="#tabs-2"><input src="Pawn_moves_files/View-prblm-bttn.jpg" name="View" type="image"></a>
+									</form>
+								</td>
+								<td width="200px"></td>
+							</tr>
+						</tbody></table>
+					</div>
+				</td>
+				<td valign="top">
+
+
+					<div class="rightmain">
+						<table style="border-collapse: collapse;" width="100%" height="10%" border="0">
+
+
+							<tbody><tr>
+								<td style="background-color: #D3D3D3; height: 22px"><a href="https://www.tcscodevita.com/CodevitaV6/guidelines.jsp" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Rules
+										&amp; Regulations</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+							</tr><tr>
+								<td style="background-color: gray; height: 22px; width: 172px"><a href="javascript:alert1();" title="Enable after View Full Problem click" style="color: #ffffff; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Launch
+										Code Editor</a></td>
+							</tr>
+
+<tr>
+												<td width="172px" height="15px"></td><td>
+											</td></tr>
+											<tr>
+										     <td style="background-color:#D3D3D3;height:22px; width:172px"><a href="https://www.tcscodevita.com/CodevitaV6/Notifications" style="color:#950000;font-weight:bold;margin-left:8px;text-decoration: none;font-size:12px;">Notifications</a></td>
+												</tr>
+
+<tr>
+												<td width="172px" height="15px"></td><td>
+											</td></tr>
+											<tr>
+										     <td style="background-color:#D3D3D3;height:22px; width:172px"><a href="https://www.tcscodevita.com/CodevitaV6/statusmessages.pdf" download="" style="color:#950000;font-weight:bold;margin-left:8px;text-decoration: none;font-size:12px;">Status messages</a></td>
+												</tr>
+							<tr>
+								<td>
+									<div style="height: 100px; position: relative;"></div>
+								</td>
+							</tr>
+						</tbody></table>
+					</div>
+
+				</td>
+			</tr>
+		</tbody></table>
+	</div>
+	
+	
+	<div id="tabs-3" aria-labelledby="ui-id-3" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none;" aria-expanded="false" aria-hidden="true">
+		<table>
+			<tbody><tr>
+				<td width="800px" valign="top">
+					<div class="border">
+						<div class="Section1">
+							<p class="MsoNormal" style="text-align: left" align="center">
+								<b style="mso-bidi-font-weight: normal"><span class="problem">Problem : Ram and Chocolates<o:p></o:p></span></b>
+							</p>
+
+							<p class="MsoNormal">
+								<span style="font-family: Verdana"><o:p>
+									</o:p></span>
+							</p>
+
+
+
+							<p class="MsoNormal">
+								<o:p>
+								</o:p>
+							</p>
+
+							<p class="MsoNormal">
+								<span style="font-family: Verdana">Ram is a school boy. He has n
+ good friends numbered from 1 to n. Let this be denoted by an Array A. 
+The friend with higher array index is closer to Ram. It's his birthday 
+today and hence he wants to distribute his birthday chocolates in a way 
+such that A[i+1]=A[i]+3. Now he had n boxes numbered from 1 to n for 
+each of his friend and his mother had filled them with some random 
+number of chocolates, However Ram has made up his mind to distribute the
+  the chocolates in the way described above. He wants to know if it is 
+possible to re-arrange the chocolates in the boxes to have a 
+distribution pattern he likes. <o:p></o:p>
+								</span>
+							</p>
+						</div>
+						<table>
+							<tbody><tr>
+								<td>
+									<form action="/CodevitaV6/StartProblem" method="post">
+										<input name="radio" value="C" type="hidden"> <a href="#tabs-3"><input src="Pawn_moves_files/View-prblm-bttn.jpg" name="View" type="image"></a>
+									</form>
+								</td>
+								<td width="200px"></td>
+							</tr>
+						</tbody></table>
+					</div>
+				</td>
+				<td valign="top">
+
+
+					<div class="rightmain">
+						<table style="border-collapse: collapse;" width="100%" height="10%" border="0">
+
+
+							<tbody><tr>
+								<td style="background-color: #D3D3D3; height: 22px"><a href="https://www.tcscodevita.com/CodevitaV6/guidelines.jsp" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Rules
+										&amp; Regulations</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+							</tr><tr>
+								<td style="background-color: gray; height: 22px; width: 172px"><a href="javascript:alert1();" title="Enable after View Full Problem click" style="color: #ffffff; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Launch
+										Code Editor</a></td>
+							</tr>
+
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/Notifications" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Notifications</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/statusmessages.pdf" download="" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Status
+										messages</a></td>
+							</tr>
+
+							<tr>
+								<td>
+									<div style="height: 100px; position: relative;"></div>
+								</td>
+							</tr>
+						</tbody></table>
+					</div>
+
+				</td>
+			</tr>
+		</tbody></table>
+	</div>
+	
+	
+	<div id="tabs-4" aria-labelledby="ui-id-4" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="true" aria-hidden="false" style="display: block;">
+		<table>
+			<tbody><tr>
+				<td width="800px" valign="top">
+					<div class="border">
+						<div class="Section1">	
+					<p class="MsoNormal" style="text-align:left" align="center"><b style="mso-bidi-font-weight:
+					normal"><span class="problem">Problem : Pawn Moves <o:p></o:p></span></b></p>
+					
+					<p class="western" style="line-height:140%;margin-bottom: 0in;" align="JUSTIFY">
+					<br>
+					<b>Background</b><br><br>
+					A Chess board position is accurately captured by Forsyth-Edwards 
+notation and is abbreviated as FEN. A FEN "record" defines a particular 
+game position, all in one text line and using only the ASCII character 
+set. A FEN record contains six fields. A complete description of the FEN
+ format to represent Chess positions can be found at <a href="https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation" target="_blank" style="color:#0000ff; background-color:transparent; text-decoration:none">here</a> 
+					<br><br>
+					For the purpose of this problem only consider first of the six 
+fields of FEN. Before we describe the problem, let us look at how FEN 
+maps to a board position. The following 5 images show board positions 
+and its corresponding FEN representation.
+					<br><br>
+					</p><p style="float:left;">
+					<img src="Pawn_moves_files/cv15R2_R1P2_fig1.png" width="250px" height="250px">
+					<br><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-size:10px;"><b>Figure 1.</b></span>
+					</p>
+					<br><br><br><br>
+					<p style="float:right;">
+					</p><table style="float:right;" width="400" cellspacing="0" cellpadding="2" border="1"><tbody><tr><td>This
+ board position depicts initial position before any side has made a 
+move. In FEN format this board position is represented as 
+					<br><br><br>
+					rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w</td></tr></tbody></table><br><br><br><br><br><br>
+					<p></p>
+					<br><br><br><br><br><br><br><br><br>
+					Let's say, White plays e4. Then the board position looks like shown below
+					<br><br>
+					<p style="float:left;">
+					<img src="Pawn_moves_files/cv15R2_R1P2_fig2.png" width="250px" height="250px">
+					<br><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-size:10px;"><b>Figure 2.</b></span>
+					</p>
+					<br><br><br><br>
+					<p style="float:right;">
+					</p><table style="float:right;" width="400" cellspacing="0" cellpadding="2" border="1"><tbody><tr><td>This board position depicts the Chess board after White has played e4. In FEN format this board position is represented as 
+					<br><br><br>
+					rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b</td></tr></tbody></table><br><br><br>
+					<p></p>
+					<br><br><br><br><br><br><br><br><br><br><br><br>					
+					Similarly, 3 more half-moves are depicted in following diagrams
+					<br><br>
+					<p>
+					<img src="Pawn_moves_files/cv15R2_R1P2_fig3.png" width="230px" height="250px">&nbsp;
+					<img src="Pawn_moves_files/cv15R2_R1P2_fig4.png" width="230px" height="250px">&nbsp;
+					<img src="Pawn_moves_files/cv15R2_R1P2_fig5.png" width="230px" height="250px">
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span style="font-size:10px;"><b>Figure 3.</b></span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span style="font-size:10px;"><b>Figure 4.</b></span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span style="font-size:10px;"><b>Figure 5.</b></span>
+					</p>
+					<br><br>
+					The FENs corresponding to Figure 3, 4 and 5 are represented as 
+					<br><br><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					3.	rnbqkbnr/pppp1ppp/8/4P3/4P3/8/PPPP1PPP/RNBQKBNR w<br><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					4.	rnbqkbnr/pppp1ppp/8/4p3/4PP2/8/PPPP2PP/RNBQKBNR b<br><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					5.	rnbqkbnr/pppp1ppp/8/8/4Pp2/8/PPPP2PP/RNBQKBNR w
+					<br><br>
+					<b>Wikipedia describes first field of FEN format as follows</b>
+					<br><br>
+					Each rank is described, starting with rank 8 and ending with rank 
+1; within each rank, the contents of each square are described from file
+ "a" through file "h". Following the <a href="https://en.wikipedia.org/wiki/Algebraic_chess_notation" target="_blank" style="color:#0000ff; background-color:transparent; text-decoration:none">Standard Algebraic Notation</a>
+ (SAN), each piece is identified by a single letter taken from the 
+standard English names (pawn = "P", knight = "N", bishop = "B", rook = 
+"R", queen = "Q" and king = "K").[1] White pieces are designated using 
+upper-case letters ("PNBRQK") while black pieces use lowercase 
+("pnbrqk"). Empty squares are noted using digits 1 through 8 (the number
+ of empty squares), and "/" separates ranks.
+					<br><br>
+					The second field denotes whose move it is now. "w" depicts that it 
+is White's turn to play and "b" indicates that it is Black's turn to 
+play
+					<br><br>
+					<b>CodeVita Problem Statement</b>
+					<br><br>
+					Given a board position in FEN format, your task is to find out all the move(s) that Pawn(s) of the playing side can make.
+					<br><br>	
+					<p></p>
+					
+					
+					<p style="line-height:140%;"><b>Input Format:</b>
+					<br><br>
+					</p><ol>
+					<li>First line contains single FEN record, which corresponds to a particular board position and also indicates whose turn it is.</li>
+					</ol>
+					<br>
+					<p></p>
+					
+					<p style="line-height:140%;"><b>Output Format:</b>
+					<br><br>
+					</p><ol>
+					<li>1The output must be printed as follows
+					<ol>
+					<li>All legal moves that Pawn(s) can make must be in the format "[&lt;Move Format&gt;]"</li>
+					<li>Where &lt;Move Format&gt; is move represented in format "[fromSquare][toSquare]"</li>
+					</ol>
+					</li>
+					<li>See Example section for better understanding of output format</li>
+					<li>Follow Output printing specification to print the output in required format</li>
+					</ol>
+					<br>
+					<p></p>
+										
+					<p class="western" style="line-height:140%;margin-bottom: 0in;" align="JUSTIFY">
+					<font face="Verdana, sans-serif"><b>Constraints:</b></font><br>
+					<br>
+					</p><ol>
+					<li>There is no need to handle <a href="https://en.wikipedia.org/wiki/En_passant" target="_blank" style="color:#0000ff; background-color:transparent; text-decoration:none">En Passant</a> positions. There are no test cases involving En Passant moves.</li>
+					<li>No need to implement <a href="https://en.wikipedia.org/wiki/Promotion_%28chess%29" target="_blank" style="color:#0000ff; background-color:transparent; text-decoration:none">pawn promotion</a> rules. Our test cases do not contain positions which will lead to a pawn getting promoted.</li>
+					</ol>
+					<br>
+					<p></p>
+					
+					<a><b>Sample Input and Output</b></a><a><br><br>
+					<table width="700px" cellspacing="0" cellpadding="2" border="1">
+						<tbody><tr>
+							<th style="height:20px">SNo.</th><th style="height:20px">Input</th><th style="height:20px">Board Depiction</th><th style="height:20px">Output</th>
+						</tr>
+						<tr>
+							<td style="width:10px;">1</td>
+							<td style="width:230px;"><br>8/1k6/8/p7/K7/8/8/8 b<br><br></td>
+							<td style="width:300px;"><br><img src="Pawn_moves_files/ptc1.png" width="270px" height="250px"><br><br></td>
+							<td style="width:150px"><br>[]<br></td>							
+						</tr>
+						<tr>
+							<td style="width:10px;">2</td>
+							<td style="width:230px;"><br>8/8/8/1k6/p7/1N6/8/1K6 b<br><br></td>
+							<td style="width:300px;"><br><img src="Pawn_moves_files/ptc2.png" width="270px" height="250px"><br><br></td>
+							<td style="width:150px"><br>[a4a3, a4b3]<br></td>							
+						</tr>
+						<tr>
+							<td style="width:10px;">3</td>
+							<td style="width:230px;"><br>8/8/8/1k6/p7/1N1p4/8/1K6 b<br><br></td>
+							<td style="width:300px;"><br><img src="Pawn_moves_files/ptc3.png" width="270px" height="250px"><br><br></td>
+							<td style="width:150px"><br>[a4a3, a4b3, d3d2]<br></td>							
+						</tr>				
+					</tbody></table>
+					<br><br>
+				<p style="line-height:140%;"><b>Print Specification:</b>
+					<br><br>
+					</p><ol>
+					<li>Should start with "[" and end with "]"</li>
+					<li>If more than one move is possible, moves should be separated by a comma followed by whitespace</li>
+					<li>Moves of a single pawn should be printed in <i>Move Format</i>. Scan the board from 8<sup>th</sup> rank to 1<sup>st</sup> rank from a-file to h-file. Whichever square gets hit first, that move should be printed first.</li>
+					<li>If more than one pawn exists for side to move, then start scanning for pawn from 8<sup>th</sup> rank to 1<sup>st</sup> rank, left to right i.e. from a-file to h-file. Whichever pawn  appears first, print all moves for that pawn first.</li>
+					<li>Verify your understanding of how printing should happen against examples shown above</li>
+					</ol>
+					<br>
+					<p></p>
+				</a></div><a>
+						<div class="note">
+							<p class="western" style="margin-top: 0.07in; margin-bottom: 0in; widows: 2; orphans: 2">
+								<font color="#950000"><i><b>Note</b></i></font>:<br> <br>
+								<i> Please do not use package and namespace in your code.
+									For object oriented languages your code should be written in
+									one class.</i>
+							</p>
+							<p class="western" style="margin-top: 0.07in; margin-bottom: 0in; widows: 2; orphans: 2">
+								<font color="#950000"><i><b>Note</b></i></font>:<br> <br>
+								<i>Participants submitting solutions in C language should
+									not use functions from &lt;conio.h&gt; / &lt;process.h&gt; as
+									these files do not exist in gcc</i>
+							</p>
+							<p class="western" style="margin-top: 0.07in; margin-bottom: 0in; widows: 2; orphans: 2">
+								<font color="#950000"><i><b>Note</b></i></font>:<br> <br>
+								<i>For C and C++, return type of main() function should be
+									int.</i>
+							</p>
+							<br> <br> <font color="blue"><b>© 2017
+									Tata Consultancy Services Limited. All Rights Reserved. </b></font>
+							<p class="western" style="margin-bottom: 0in" align="JUSTIFY">
+								<br>
+							</p>
+						</div>
+					</a></div><a> <br> <br> </a><a style="color: #950000; font-weight: bold;">Submit
+						Answer</a>
+					<div class="submitsolution">
+						<input checked="checked" class="confirm default-confirm" value="1" type="radio"> I , <b>RAJAT PUNDIR</b> confirm that the
+						answer submitted is my own. <br> <input class="confirm" value="0" type="radio"> I would like to provide
+						attribution to the following sources. <br>
+						<br>
+
+						<div class="links-comments" style="display: none">
+							Specify links in below input (each link on new line):<br>
+							<textarea class="text-links" maxlength="999"></textarea>
+							<br>
+							<br> Mention any comments you want to give:<br>
+							<textarea class="text-comments" maxlength="999"></textarea>
+							<br>
+						</div>
+
+						<div>
+							<select style="margin: 7px;" name="extension" id="extensionD">
+								<option value="">Select Language</option>
+								<option value=".c" selected="selected">C</option>
+								<option value=".cpp">CPP</option>
+								<option value=".cs">C sharp</option>
+								<option value=".java7">Java 7</option>
+								<option value=".java8">Java 8</option>
+								<option value=".js">Javascript</option>
+								<option value=".pl">Perl</option>
+								<option value=".php">Php</option>
+								<option value=".py2">Python 2</option>
+								<option value=".py3">Python 3</option>
+								<option value=".rb">Ruby</option>
+							</select> <br> <label style="margin: 7px;">Select File</label> <br>
+						</div>
+						<div class="fileinputs" style="width: 430px;">
+							<input class="file_hidden" name="txtUNameMem1" id="Program_D" size="25" onchange="select_file(this.id,this,'STARTED')" type="file">
+							<div class="fakefile" style="width: 400px;">
+								<input size="30" name="fake_file_input"> <input value="Browse..." name="Browse" type="button">
+							</div>
+						</div>
+						<div class="filesubmit">
+							<!--<input type="Submit" value="Submit" name="Submit" id="upload" style="position:absolute;left:10px;">-->
+							<input value="Submit" name="Submit" id="upload" src="Pawn_moves_files/Submit-bttn.jpg" type="image" height="20px">
+							<span></span>
+						</div>
+					</div>
+				</td>
+				<td valign="top">
+
+
+					<div class="rightmain">
+						<table style="border-collapse: collapse;" width="100%" height="10%" border="0">
+
+
+							<tbody><tr>
+								<td style="background-color: #D3D3D3; height: 22px"><a href="https://www.tcscodevita.com/CodevitaV6/guidelines.jsp" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Rules
+										&amp; Regulations</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+							</tr><tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="javascript:checkStatus();" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Launch
+										Code Editor</a></td>
+							</tr>
+
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/Notifications" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Notifications</a></td>
+							</tr>
+
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/statusmessages.pdf" download="" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Status
+										messages</a></td>
+							</tr>
+							<tr>
+								<td>
+									<div style="height: 100px; position: relative;"></div>
+								</td>
+							</tr>
+						</tbody></table>
+					</div>
+
+
+				</td>
+			</tr>
+		</tbody></table>
+	</div>
+	
+	
+	<div id="tabs-5" aria-labelledby="ui-id-5" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none;" aria-expanded="false" aria-hidden="true">
+		<table>
+			<tbody><tr>
+				<td width="800px" valign="top">
+					<div class="border">
+						<div class="Section1">
+					<p class="MsoNormal" style="text-align:left" align="center"><b style="mso-bidi-font-weight:
+					normal"><span class="problem">Problem : Verify JSON Object validity<o:p></o:p></span></b></p>
+					
+					<p class="MsoNormal"><span style="font-family:Verdana"><o:p> </o:p></span></p>
+					
+					
+					
+					<p class="MsoNormal"><o:p> </o:p></p>
+					
+					<p class="MsoNormal"><span style="font-family:Verdana">
+					A JSON object is a key-value pair data structure that is enclosed within { }. A sample JSON object would look like<br>
+{<br>
+"key1":"value1",<br>
+"key2":"value2",<br>
+<o:p></o:p></span></p>
+				</div>
+						<table>
+							<tbody><tr>
+								<td>
+									<form action="/CodevitaV6/StartProblem" method="post">
+										<input name="radio" value="E" type="hidden"> <a href="#tabs-5"><input src="Pawn_moves_files/View-prblm-bttn.jpg" name="View" type="image"></a>
+									</form>
+								</td>
+								<td width="200px"></td>
+							</tr>
+						</tbody></table>
+					</div>
+				</td>
+				<td valign="top">
+
+					<div class="rightmain">
+						<table style="border-collapse: collapse;" width="100%" height="10%" border="0">
+
+
+							<tbody><tr>
+								<td style="background-color: #D3D3D3; height: 22px"><a href="https://www.tcscodevita.com/CodevitaV6/guidelines.jsp" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Rules
+										&amp; Regulations</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+							</tr><tr>
+								<td style="background-color: gray; height: 22px; width: 172px"><a href="javascript:alert1();" title="Enable after View Full Problem click" style="color: #ffffff; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Launch
+										Code Editor</a></td>
+							</tr>
+
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/Notifications" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Notifications</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/statusmessages.pdf" download="" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Status
+										messages</a></td>
+							</tr>
+
+							<tr>
+								<td>
+									<div style="height: 100px; position: relative;"></div>
+								</td>
+							</tr>
+						</tbody></table>
+					</div>
+
+				</td>
+			</tr>
+		</tbody></table>
+
+	</div>
+	
+	
+	<div id="tabs-6" aria-labelledby="ui-id-6" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none;" aria-expanded="false" aria-hidden="true">
+		<table>
+			<tbody><tr>
+				<td width="800px" valign="top">
+					<div class="border">
+						<div class="Section1">
+							<p class="MsoNormal" style="text-align: left" align="center">
+								<b style="mso-bidi-font-weight: normal"><span class="problem">Problem : Last Digit<o:p></o:p></span></b>
+							</p>
+
+							<p class="MsoNormal">
+								<span style="font-family: Verdana"><o:p>
+									</o:p></span>
+							</p>
+
+
+
+							<p class="MsoNormal">
+								<o:p>
+								</o:p>
+							</p>
+
+							<p class="MsoNormal">
+								<span style="font-family: Verdana">
+								<br>
+								<b>Statement :</b>
+								<br><br>
+								Compute the last digit of the following sequence<o:p></o:p>
+								</span>
+							</p>
+						</div>
+						<table>
+							<tbody><tr>
+								<td>
+									<form action="/CodevitaV6/StartProblem" method="post">
+										<input name="radio" value="F" type="hidden"> <a href="#tabs-6"><input src="Pawn_moves_files/View-prblm-bttn.jpg" name="View" type="image"></a>
+									</form>
+								</td>
+								<td width="200px"></td>
+							</tr>
+						</tbody></table>
+					</div>
+				</td>
+				<td valign="top">
+
+					<div class="rightmain">
+						<table style="border-collapse: collapse;" width="100%" height="10%" border="0">
+
+
+							<tbody><tr>
+								<td style="background-color: #D3D3D3; height: 22px"><a href="https://www.tcscodevita.com/CodevitaV6/guidelines.jsp" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Rules
+										&amp; Regulations</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+							</tr><tr>
+								<td style="background-color: gray; height: 22px; width: 172px"><a href="javascript:alert1();" title="Enable after View Full Problem click" style="color: #ffffff; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Launch
+										Code Editor</a></td>
+							</tr>
+
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/Notifications" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Notifications</a></td>
+							</tr>
+
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/statusmessages.pdf" download="" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Status
+										messages</a></td>
+							</tr>
+							<tr>
+								<td>
+									<div style="height: 100px; position: relative;"></div>
+								</td>
+							</tr>
+						</tbody></table>
+					</div>
+
+				</td>
+			</tr>
+		</tbody></table>
+
+	</div>
+	
+	
+	<div id="tabs-7" aria-labelledby="ui-id-7" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none;" aria-expanded="false" aria-hidden="true">
+		<table>
+			<tbody><tr>
+				<td width="800px" valign="top">
+					<div class="border">
+						<div class="Section1">
+					<p class="MsoNormal" style="text-align:left" align="center"><b style="mso-bidi-font-weight:
+					normal"><span class="problem">Problem : Checking Moves <o:p></o:p></span></b></p>
+					
+					<p class="MsoNormal"><span style="font-family:Verdana"><o:p> </o:p></span></p>
+					
+					
+					
+					<p class="MsoNormal"><o:p> </o:p></p>
+					
+					<p class="MsoNormal"><span style="font-family:Verdana">
+					<b>Background</b>
+					<br><br>
+					A Chess board position is accurately captured by Forsyth-Edwards 
+notation and is abbreviated as FEN. A FEN "record" defines a particular 
+game position, all in one line of text and using only the ASCII 
+character set. A FEN record consists of six fields. A complete 
+description of the FEN format to represent Chess positions can be found <a href="https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation" target="_blank" style="color:#0000ff; background-color:transparent; text-decoration:none">here</a> <o:p></o:p></span></p>
+				</div>
+						<table>
+							<tbody><tr>
+								<td>
+									<form action="/CodevitaV6/StartProblem" method="post">
+										<input name="radio" value="G" type="hidden"> <a href="#tabs-7"><input src="Pawn_moves_files/View-prblm-bttn.jpg" name="View" type="image"></a>
+									</form>
+								</td>
+								<td width="200px"></td>
+							</tr>
+						</tbody></table>
+					</div>
+				</td>
+				<td valign="top">
+
+
+					<div class="rightmain">
+						<table style="border-collapse: collapse;" width="100%" height="10%" border="0">
+
+
+							<tbody><tr>
+								<td style="background-color: #D3D3D3; height: 22px"><a href="https://www.tcscodevita.com/CodevitaV6/guidelines.jsp" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Rules
+										&amp; Regulations</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+							</tr><tr>
+								<td style="background-color: gray; height: 22px; width: 172px"><a href="javascript:alert1();" title="Enable after View Full Problem click" style="color: #ffffff; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Launch
+										Code Editor</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/Notifications" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Notifications</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/statusmessages.pdf" download="" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Status
+										messages</a></td>
+							</tr>
+
+
+							<tr>
+								<td>
+									<div style="height: 100px; position: relative;"></div>
+								</td>
+							</tr>
+						</tbody></table>
+					</div>
+
+				</td>
+			</tr>
+		</tbody></table>
+	</div>
+	
+	
+	<div id="tabs-8" aria-labelledby="ui-id-8" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none;" aria-expanded="false" aria-hidden="true">
+		<table>
+			<tbody><tr>
+				<td width="800px" valign="top">
+					<div class="border">
+						<div class="Section1">
+							<p class="MsoNormal" style="text-align: left" align="center">
+								<b style="mso-bidi-font-weight: normal"><span class="problem">Problem : RLE String <o:p></o:p></span></b>
+							</p>
+
+							<p class="MsoNormal">
+								<span style="font-family: Verdana"><o:p>
+									</o:p></span>
+							</p>
+
+
+
+							<p class="MsoNormal">
+								<o:p>
+								</o:p>
+							</p>
+
+							<p class="MsoNormal">
+								<span style="font-family: Verdana">Given a Run Length Encoded 
+ASCII (Base 64) String as input, write a program to decode the string 
+and print the corresponding image. Number of characters in each row of 
+the resulting image is always 57. <o:p></o:p>
+								</span>
+							</p>
+						</div>
+						<table>
+							<tbody><tr>
+								<td>
+									<form action="/CodevitaV6/StartProblem" method="post">
+										<input name="radio" value="H" type="hidden"> <a href="#tabs-8"><input src="Pawn_moves_files/View-prblm-bttn.jpg" name="View" type="image"></a>
+									</form>
+								</td>
+								<td width="200px"></td>
+							</tr>
+						</tbody></table>
+					</div>
+				</td>
+				<td valign="top">
+
+
+					<div class="rightmain">
+						<table style="border-collapse: collapse;" width="100%" height="10%" border="0">
+
+
+							<tbody><tr>
+								<td style="background-color: #D3D3D3; height: 22px"><a href="https://www.tcscodevita.com/CodevitaV6/guidelines.jsp" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Rules
+										&amp; Regulations</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+							</tr><tr>
+								<td style="background-color: gray; height: 22px; width: 172px"><a href="javascript:alert1();" title="Enable after View Full Problem click" style="color: #ffffff; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Launch
+										Code Editor</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/Notifications" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Notifications</a></td>
+							</tr>
+							<tr>
+								<td width="172px" height="15px">
+								</td><td>
+							</td></tr>
+							<tr>
+								<td style="background-color: #D3D3D3; height: 22px; width: 172px"><a href="https://www.tcscodevita.com/CodevitaV6/statusmessages.pdf" download="" style="color: #950000; font-weight: bold; margin-left: 8px; text-decoration: none; font-size: 12px;">Status
+										messages</a></td>
+							</tr>
+
+
+							<tr>
+								<td>
+									<div style="height: 100px; position: relative;"></div>
+								</td>
+							</tr>
+						</tbody></table>
+					</div>
+
+				</td>
+			</tr>
+		</tbody></table>
+	</div>
+	
+</div>
+
+ 
+
+							</td>
+							<td width="23px"></td>
+						</tr>
+						<tr>
+							<td colspan="2" align="left">
+								<div id="editor_alert" style="width: 85%;"></div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<div style="height: 90px;"></div>
+							</td>
+							<td><img style="margin-top: -70px; margin-right: 23px;" src="Pawn_moves_files/Mascot-Small.jpg" border="0" align="right"></td>
+						</tr>
+					</tbody></table>
+					<!-- <div class="lower" >
+							<table border="0" style="position:relative;border-collapse:collapse;" align="center" width="932px">
+								<tr>
+									<td height="20px"></td>
+								</tr>
+								<tr>
+									<td ><a class="footer">&copy; 2016 Tata Consultancy Services Limited. All Rights Reserved.&nbsp;&nbsp;&nbsp</a></td>
+									<td ><a class="footer">In Association with</a></td>
+									<td ><img border="0" src="/CodevitaV6/images/Campus-Commune-Logo.jpg"></td>
+									<td ><a class="footer">|</a><a class="footer">&nbsp;Privacy Policy &nbsp;&nbsp;</a></td>
+									<td ><a class="footer" >|</a><a href="/CodevitaV6/privacypolicy.jsp" target="_blank style=" text-decoration:none; color:white;">&nbsp;Privacy Policy &nbsp;&nbsp;</a></td>
+									<td >
+										<a href="/CodevitaV6/redirectToTwitter.jsp" target="_blank"><img border="0" src="/CodevitaV6/images/twitter-icn.jpg"></a>
+				<a href="/CodevitaV6/redirectToLinkedIN.jsp" target="_blank"><img border="0" src="/CodevitaV6/images/linked-in-icn.jpg"></a>
+				<a href="/CodevitaV6/redirectToFacebook.jsp" target="_blank"><img border="0" src="/CodevitaV6/images/Facebook-icn.jpg"></a>
+				<a href="https://twitter.com/TCS_News" target="_blank"><img border="0" src="/CodevitaV6/images/twitter-icn.jpg"></a>
+				<a href="http://www.linkedin.com/company/tata-consultancy-services/careers?trk=top_nav_careers" target="_blank"><img border="0" src="/CodevitaV6/images/linked-in-icn.jpg"></a>
+				<a href="http://www.facebook.com/TataConsultancyServices" target="_blank"><img border="0" src="/CodevitaV6/images/Facebook-icn.jpg"></a>
+									</td>
+									<td align="right">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img border="0" src="/CodevitaV6/images/TATA-logo.jpg"></td>
+								</tr>
+							</table>
+						</div>  -->
+
+					
+<!-- <div id="google_translate_element" style="float: right;"></div> -->
+<div class="lower" style="">
+	<table style="position: relative; border-collapse: collapse;background-color:#242021;" width="932px;" border="0" align="center">
+		<tbody><tr>
+			<td style="background-color:#242021;" height="20px"></td>
+		</tr>
+		<tr>
+			<td>
+			
+			<a class="footer">© 2017 Tata Consultancy Services
+					Limited. All Rights Reserved.&nbsp;&nbsp;&nbsp;</a></td>
+			<td><a class="footer">In Association with</a></td>
+			<td><img src="Pawn_moves_files/CodeVita-Registration-Footer-CCLogo.png" border="0"></td>
+			<td><a class="footer">|</a><a class="footer" href="https://www.tcscodevita.com/CodevitaV6/privacypolicy.jsp" target="_blank style=" text-decoration:none;="" color:white;"=""><font color="white">&nbsp;Privacy
+					Policy &nbsp;&nbsp;</font></a></td>
+			<td>
+				<!-- <a href="/CodevitaV6/redirectToTwitter.jsp" target="_blank"><img border="0" src="/CodevitaV6/images/twitter-icn.jpg"></a>
+				<a href="/CodevitaV6/redirectToLinkedIN.jsp" target="_blank"><img border="0" src="/CodevitaV6/images/linked-in-icn.jpg"></a>
+				<a href="/CodevitaV6/redirectToFacebook.jsp" target="_blank"><img border="0" src="/CodevitaV6/images/Facebook-icn.jpg"></a> -->
+				<a href="https://twitter.com/TCS_News" target="_blank"><img src="Pawn_moves_files/CodeVita-Registration-Footer-TWLogo.png" border="0"></a> <a href="http://www.linkedin.com/company/tata-consultancy-services/careers?trk=top_nav_careers" target="_blank"><img src="Pawn_moves_files/CodeVita-Registration-Footer-LinkedeInLogo.png" border="0"></a> <a href="http://www.facebook.com/TataConsultancyServices" target="_blank"><img src="Pawn_moves_files/CodeVita-Registration-Footer-FBLogo.png" border="0"></a>
+			</td>
+			<td align="right">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="Pawn_moves_files/CodeVita-Registration-Footer-TATALogo.png" border="0"></td>
+		</tr>
+	</tbody></table>
+</div>
+					<!-- <img style=" margin-top:-230px;margin-right:23px;" align="right" border="0" src="/CodevitaV6/images/Mascot-Small.jpg" > -->
+				</div>
+			</td>
+		</tr>
+	</tbody></table>
+	<!--
+		Notification Popup
+		-->
+	<div id="notification_popup_box" class="ui-dialog-content ui-widget-content" style="vertical-align: middle; display: none;">
+		<div style="text-align: right;">
+			<span id="close_icon" onclick="closeNotification()" style="margin-top: -15px; position: absolute; right: 0px;">&nbsp;&nbsp;&nbsp;</span>
+		</div>
+		<div id="notification_popup_text"></div>
+	</div>
+	<input name="selected_problem" value="D" type="hidden">
+	<input id="refreshed" value="yes" type="hidden">
+
+
+<script src="Pawn_moves_files/gen_validatorv4.js"></script>
+<script src="Pawn_moves_files/ajaxfileupload.js"></script>
+<script src="Pawn_moves_files/reportstartjs.js"></script>
+<script src="Pawn_moves_files/jquery.js"></script>
+<script src="Pawn_moves_files/problemstartjs.js"></script>
+<script>
+	var dLang = '';
+	if(dLang){
+		$("select[name='extension']").val(dLang);
+	}
+	
+	function updateDefaultLang(){
+		var lang = $("select[name='defaultlang']").val();
+		if(lang){
+			var that = $(this);
+			$.post( "/CodevitaV6/UpdateDefaultLang",{defaultLang:lang}, function( data ) {
+				$("select[name='extension']").val(lang);
+			});
+		}
+	}
+	
+	
+</script>
+<script>
+</script>
+
+
+
+</body></html>
