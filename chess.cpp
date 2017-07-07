@@ -45,7 +45,7 @@ struct move *moves = NULL;
    KNIGHT. Allowed to move one step in eight strange directions.
    PAWN.   Allowed to move one step forward in three directions.
    
- */
+*/
 
 void initialise_board() {
   for(int i = 0; i < 12; i++) {
@@ -61,10 +61,10 @@ void initialise_board() {
 void show_board() {
   if (FULL) {
     for(int i = 0; i < 12; i++) {
-     for(int j = 0; j < 12; j++) 
-      printf("%d\t",a[i][j]);
-    printf("\n");
-   }
+      for(int j = 0; j < 12; j++) 
+	printf("%d\t",a[i][j]);
+      printf("\n");
+    }
   }
   else {
     for(int i = 2; i < 10; i++) {
@@ -128,12 +128,20 @@ void read_fen() {
   }
 }
 
-void clear_list() {
+void clear_moves() {
   move *temp = NULL;
   while(moves != NULL) {
     temp = moves;
     moves = moves -> next;
     free(temp);
+  }
+}
+
+void show_moves() {
+  move *temp = moves;
+  while(temp != NULL) {
+    printf("\nrow=%d, col=%d", temp -> row, temp -> column);
+    temp = temp -> next;
   }
 }
 
@@ -202,15 +210,28 @@ void move_in_direction(int row, int column, int direction) {
 	break;
       }
     }
- }
+  }
 }
 
+void move_diagonally(int row, int column) {
+  move_in_direction(row, column, NORTH_EAST);
+  move_in_direction(row, column, SOUTH_EAST);
+  move_in_direction(row, column, SOUTH_WEST);
+  move_in_direction(row, column, NORTH_WEST);
+}
+
+void move_straight(int row, int column) {
+  move_in_direction(row, column, NORTH);
+  move_in_direction(row, column, EAST);
+  move_in_direction(row, column, SOUTH);
+  move_in_direction(row, column, WEST);
+}
 
 void moves_of_pawn(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the pawn at (row,column) can make.
   if(a[row][column] != PAWN)
     return;
-  clear_list();
+  clear_moves();
   if(a[row][column] > 0) {	// if piece is white
     if(a[row - 1][column] == BLANK) 
       push_move(row - 1, column);
@@ -233,65 +254,112 @@ void moves_of_bishop(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the bishop at (row,column) can make.
   if(a[row][column] != BISHOP)
     return;
-  clear_list();
-  if(a[row][column] > 0) {	// if piece is white
-    
-  }
-  else {			// else piece is black
-    
- }
+  clear_moves();
+  move_diagonally(row, column);
 }
 
 void moves_of_knight(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the knight at (row,column) can make.
   if(a[row][column] != KNIGHT)
     return;
-  clear_list();
+  clear_moves();
   if(a[row][column] > 0) {	// if piece is white
-    
+    if(a[row - 1][column - 2] == BLANK || a[row - 1][column - 2] < 0)
+      push_move(row - 1, column - 2);
+    if(a[row - 1][column + 2] == BLANK || a[row - 1][column + 2] < 0)
+      push_move(row - 1, column + 2);
+    if(a[row - 2][column - 1] == BLANK || a[row - 2][column - 1] < 0)
+      push_move(row - 2, column - 1);
+    if(a[row - 2][column + 1] == BLANK || a[row - 2][column + 1] < 0)
+      push_move(row - 2, column + 1);
+    if(a[row + 1][column - 2] == BLANK || a[row + 1][column - 2] < 0)
+      push_move(row + 1, column - 2);
+    if(a[row + 1][column + 2] == BLANK || a[row + 1][column + 2] < 0)
+      push_move(row + 1, column + 2);
+    if(a[row + 2][column - 1] == BLANK || a[row + 2][column - 1] < 0)
+      push_move(row + 2, column - 1);
+    if(a[row + 2][column + 1] == BLANK || a[row + 2][column + 1] < 0)
+      push_move(row + 2, column + 1);
   }
   else {			// else piece is black
-    
- }
+    if(a[row - 1][column - 2] == BLANK || a[row - 1][column - 2] > 0)
+      push_move(row - 1, column - 2);
+    if(a[row - 1][column + 2] == BLANK || a[row - 1][column + 2] > 0)
+      push_move(row - 1, column + 2);
+    if(a[row - 2][column - 1] == BLANK || a[row - 2][column - 1] > 0)
+      push_move(row - 2, column - 1);
+    if(a[row - 2][column + 1] == BLANK || a[row - 2][column + 1] > 0)
+      push_move(row - 2, column + 1);
+    if(a[row + 1][column - 2] == BLANK || a[row + 1][column - 2] > 0)
+      push_move(row + 1, column - 2);
+    if(a[row + 1][column + 2] == BLANK || a[row + 1][column + 2] > 0)
+      push_move(row + 1, column + 2);
+    if(a[row + 2][column - 1] == BLANK || a[row + 2][column - 1] > 0)
+      push_move(row + 2, column - 1);
+    if(a[row + 2][column + 1] == BLANK || a[row + 2][column + 1] > 0)
+      push_move(row + 2, column + 1);
+  }
 }
 
 void moves_of_rook(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the rook at (row,column) can make.
   if(a[row][column] != ROOK)
     return;
-  clear_list();
-  if(a[row][column] > 0) {	// if piece is white
-    
-  }
-  else {			// else piece is black
-    
- }
+  clear_moves();
+  move_straight(row, column);
 }
 
 void moves_of_queen(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the queen at (row,column) can make.
   if(a[row][column] != QUEEN)
     return;
-  clear_list();
-  if(a[row][column] > 0) {	// if piece is white
-    
-  }
-  else {			// else piece is black
-    
- }
+  clear_moves();
+  move_diagonally(row, column);
+  move_straight(row, column);  
 }
 
 void moves_of_king(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the king at (row,column) can make.
+  // this function needs some work afterwards, like king can't take a piece which will put it in a check.
   if(a[row][column] != KING)
     return;
-  clear_list();
+  clear_moves();
   if(a[row][column] > 0) {	// if piece is white
-    
+    if(a[row - 1][column] == BLANK || a[row - 1][column] < 0)
+      push_move(row - 1, column);
+    if(a[row - 1][column - 1] == BLANK || a[row - 1][column - 1] < 0)
+      push_move(row - 1, column - 1);
+    if(a[row - 1][column + 1] == BLANK || a[row - 1][column + 1] < 0)
+      push_move(row - 1, column + 1);
+    if(a[row][column - 1] == BLANK || a[row][column - 1] < 0)
+      push_move(row, column - 1);
+    if(a[row][column + 1] == BLANK || a[row][column + 1] < 0)
+      push_move(row, column + 1);
+    if(a[row + 1][column] == BLANK || a[row + 1][column] < 0)
+      push_move(row + 1, column);
+    if(a[row + 1][column - 1] == BLANK || a[row + 1][column - 1] < 0)
+      push_move(row + 1, column - 1);
+    if(a[row + 1][column + 1] == BLANK || a[row + 1][column + 1] < 0)
+      push_move(row + 1, column + 1);
   }
   else {			// else piece is black
-    
- }
+    if(a[row - 1][column] == BLANK || a[row - 1][column] > 0)
+      push_move(row - 1, column);
+    if(a[row - 1][column - 1] == BLANK || a[row - 1][column - 1] > 0)
+      push_move(row - 1, column - 1);
+    if(a[row - 1][column + 1] == BLANK || a[row - 1][column + 1] > 0)
+      push_move(row - 1, column + 1);
+    if(a[row][column - 1] == BLANK || a[row][column - 1] > 0)
+      push_move(row, column - 1);
+    if(a[row][column + 1] == BLANK || a[row][column + 1] > 0)
+      push_move(row, column + 1);
+    if(a[row + 1][column] == BLANK || a[row + 1][column] > 0)
+      push_move(row + 1, column);
+    if(a[row + 1][column - 1] == BLANK || a[row + 1][column - 1] > 0)
+      push_move(row + 1, column - 1);
+    if(a[row + 1][column + 1] == BLANK || a[row + 1][column + 1] > 0)
+      push_move(row + 1, column + 1);
+  }
 }
 
 
