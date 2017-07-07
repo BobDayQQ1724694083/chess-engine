@@ -1,5 +1,50 @@
 
-chess.cpp,1008
+chess.c,1071
+#define KING	6,81
+#define QUEEN	7,97
+#define ROOK	8,113
+#define KNIGHT	9,128
+#define BISHOP	10,145
+#define PAWN	11,162
+#define NORTH	14,203
+#define NORTH_EAST	15,220
+#define EAST	16,241
+#define SOUTH_EAST	17,257
+#define SOUTH	18,278
+#define SOUTH_WEST	19,295
+#define WEST	20,316
+#define NORTH_WEST	21,332
+#define INVALID	24,389
+#define BOARD_SIZE	25,409
+#define BLANK	26,431
+#define SHOW_BORDER	27,448
+int board[board30,472
+typedef struct node 32,593
+  int row;33,615
+  int column;34,626
+  struct node *next;next35,640
+}move;move36,661
+move *moves moves38,669
+void initialise_board(55,1807
+void show_board(66,2131
+void read_fen(83,2484
+void clear_moves(134,3615
+void show_moves(143,3750
+void push_move(152,3915
+void change_row_column(162,4177
+void move_in_direction(183,4627
+void move_diagonally(207,5486
+void move_straight(215,5783
+void moves_of_pawn(223,6054
+void moves_of_bishop(245,7005
+void moves_of_knight(251,7207
+void moves_of_rook(292,9327
+void moves_of_queen(298,9523
+void moves_of_king(305,9755
+int main(347,11881
+
+chess.c~,1060
+using namespace std;2,25
 #define KING	5,68
 #define QUEEN	6,84
 #define ROOK	7,100
@@ -18,28 +63,29 @@ chess.cpp,1008
 #define BLANK	24,395
 #define SHOW_BORDER	25,412
 int a[a28,436
-typedef struct move 30,539
+typedef struct node 30,539
   int row;31,561
   int column;32,572
-  struct move *next;next33,586
+  struct node *next;next33,586
 }move;move34,607
-struct move *moves moves36,615
-void initialise_board(53,1760
-void show_board(64,2003
-void read_fen(81,2304
-void clear_moves(135,3448
-void show_moves(144,3583
-void push_move(152,3742
-void move_in_direction(162,3971
-void move_diagonally(220,5371
-void move_straight(227,5602
-void moves_of_pawn(234,5809
-void moves_of_bishop(257,6684
-void moves_of_knight(265,6929
-void moves_of_rook(308,8960
-void moves_of_queen(316,9197
-void moves_of_king(325,9471
-int main(370,11507
+move *moves moves36,615
+void initialise_board(53,1753
+void show_board(64,1996
+void read_fen(81,2297
+void clear_moves(135,3442
+void show_moves(144,3577
+void push_move(152,3736
+void change_row_column(162,3990
+void move_in_direction(183,4440
+void move_diagonally(207,5269
+void move_straight(215,5566
+void moves_of_pawn(223,5837
+void moves_of_bishop(247,6789
+void moves_of_knight(255,7034
+void moves_of_rook(298,9065
+void moves_of_queen(306,9302
+void moves_of_king(315,9576
+int main(359,11611
 
 chess.cpp~,322
 #define BORDER	3,20
