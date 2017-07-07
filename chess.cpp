@@ -2,6 +2,7 @@
 using namespace std;
 
 #define BORDER	42
+#define FULL    1
 #define KING	10
 #define QUEEN	9
 #define ROOK	5
@@ -9,7 +10,17 @@ using namespace std;
 #define BISHOP	3
 #define PAWN	1
 #define BLANK	0
-#define FULL    1
+
+#define NORTH		1
+#define NORTH_EAST	2
+#define EAST		3
+#define SOUTH_EAST	4
+#define SOUTH		5
+#define SOUTH_WEST	6
+#define WEST		7
+#define NORTH_WEST	8
+
+
 
 int a[12][12];			/* Board representation, white as positive, black as negative, blanks with zeroes */
 
@@ -117,82 +128,170 @@ void read_fen() {
   }
 }
 
+void clear_list() {
+  move *temp = NULL;
+  while(moves != NULL) {
+    temp = moves;
+    moves = moves -> next;
+    free(temp);
+  }
+}
+
+void push_move(int rownum, int colnum) {
+  if (a[rownum][colnum] == BORDER)
+    return;
+  move *temp = (move *)malloc(size_of(move));
+  temp -> row = rownum - 1;
+  temp -> column = colnum;
+  temp -> next = moves;
+  moves = p;
+}
+
+void move_in_direction(int row, int column, int direction) {
+  // This function is designed to be used for bishops, rooks, and queens.
+  if(a[row][column] > 0) {	// if piece is white
+    while(a[row][column] != BORDER) {
+      if(a[row][column] > 0)	// break if piece was of same color
+	break;
+      push_move(row, column);
+      if(a[row][column] < 0)	// break if piece was of opposite color
+	break;
+      switch(direction) {
+      case NORTH: row--;
+	break;
+      case SOUTH: row++;
+	break;
+      case EAST: column++;
+	break;
+      case WEST: column--;
+	break;
+      case NORTH_EAST: row--; column++;
+	break;
+      case NORTH_WEST: row--; column--;
+	break;
+      case SOUTH_EAST: row++; column++;
+	break;
+      case SOUTH_WEST: row++; column--;
+	break;
+      }
+    }
+  }
+  else {			// else piece is black
+    while(a[row][column] != BORDER) {
+      if(a[row][column] < 0)	// break if piece was of same color
+	break;
+      push_move(row, column);
+      if(a[row][column] > 0)	// break if piece was of opposite color
+	break;
+      switch(direction) {
+      case NORTH: row--;
+	break;
+      case SOUTH: row++;
+	break;
+      case EAST: column++;
+	break;
+      case WEST: column--;
+	break;
+      case NORTH_EAST: row--; column++;
+	break;
+      case NORTH_WEST: row--; column--;
+	break;
+      case SOUTH_EAST: row++; column++;
+	break;
+      case SOUTH_WEST: row++; column--;
+	break;
+      }
+    }
+ }
+}
+
+
 void moves_of_pawn(int row, int column) {
-  // intiliases linked list pointer *moves with list of moves that the pawn at (row,column) can make.
-  int sign = a[row][column] / (abs(a[row][column]));
-  switch(sign) {
-  case 1:
-    if(a[row - 1][column] == BLANK) {
-      move *p = (move *)malloc(size_of(move));
-      p->row = row - 1;
-      p->column = column;
-      p->next = moves;
-      moves = p;
-    }
-    if(sign != ((a[row - 1][column - 1] / (abs(a[row - 1][column - 1])))) && a[row - 1][column - 1] != BLANK) {
-      move *p = (move *)malloc(size_of(move));
-      p->row = row-1;
-      p->column = column-1;
-      p->next = moves;
-      moves = p;
-    }
-    if(sign != ((a[row - 1][column + 1] / (abs(a[row - 1][column + 1])))) && a[row - 1][column + 1] != BLANK) {
-      move *p = (move *)malloc(size_of(move));
-      p->row = row - 1;
-      p->column = column + 1;
-      p->next = moves;
-      moves = p;
-    }
-    break;
-  case -1:
-    if(a[row + 1][column] == BLANK) {
-      move *p = (move *)malloc(size_of(move));
-      p->row = row + 1;
-      p->column = column;
-      p->next = moves;
-      moves = p;
-    }
-    if(sign != ((a[row + 1][column - 1] / (abs(a[row + 1][column - 1])))) && a[row + 1][column - 1] != BLANK) {
-      move *p = (move *)malloc(size_of(move));
-      p->row = row-1;
-      p->column = column-1;
-      p->next = moves;
-      moves = p;
-    }
-    if(sign != ((a[row + 1][column + 1] / (abs(a[row + 1][column + 1])))) && a[row + 1][column + 1] != BLANK) {
-      move *p = (move *)malloc(size_of(move));
-      p->row = row + 1;
-      p->column = column + 1;
-      p->next = moves;
-      moves = p;
-    }
-    break;
+  // initialises linked list pointer 'moves' with list of moves that the pawn at (row,column) can make.
+  if(a[row][column] != PAWN)
+    return;
+  clear_list();
+  if(a[row][column] > 0) {	// if piece is white
+    if(a[row - 1][column] == BLANK) 
+      push_move(row - 1, column);
+    if(a[row - 1][column - 1] < 0 && a[row - 1][column - 1] != BLANK)
+      push_move(row - 1, column - 1);
+    if(a[row - 1][column + 1] < 0  && a[row - 1][column + 1] != BLANK)
+      push_move(row - 1, colummn + 1);
+  }
+  else {			// else piece is black
+    if(a[row + 1][column] == BLANK)
+      push_move(row + 1, colummn);
+    if(a[row + 1][column - 1] < 0 && a[row + 1][column - 1] != BLANK)
+      push_move(row + 1, colummn - 1);
+    if(a[row + 1][column + 1] < 0 && a[row + 1][column + 1] != BLANK)
+      push_move(row + 1, colummn + 1);
   }
 }
 
 void moves_of_bishop(int row, int column) {
-  // intiliases linked list pointer *moves with list of moves that the bishop at (row,column) can make.
-  int sign = a[row][column] / (abs(a[row][column]));
+  // initialises linked list pointer 'moves' with list of moves that the bishop at (row,column) can make.
+  if(a[row][column] != BISHOP)
+    return;
+  clear_list();
+  if(a[row][column] > 0) {	// if piece is white
+    
+  }
+  else {			// else piece is black
+    
+ }
 }
 
 void moves_of_knight(int row, int column) {
-  // intiliases linked list pointer *moves with list of moves that the knight at (row,column) can make.
-  int sign = a[row][column] / (abs(a[row][column]));
+  // initialises linked list pointer 'moves' with list of moves that the knight at (row,column) can make.
+  if(a[row][column] != KNIGHT)
+    return;
+  clear_list();
+  if(a[row][column] > 0) {	// if piece is white
+    
+  }
+  else {			// else piece is black
+    
+ }
 }
 
 void moves_of_rook(int row, int column) {
-  // intiliases linked list pointer *moves with list of moves that the rook at (row,column) can make.
-  int sign = a[row][column] / (abs(a[row][column]));
+  // initialises linked list pointer 'moves' with list of moves that the rook at (row,column) can make.
+  if(a[row][column] != ROOK)
+    return;
+  clear_list();
+  if(a[row][column] > 0) {	// if piece is white
+    
+  }
+  else {			// else piece is black
+    
+ }
 }
 
 void moves_of_queen(int row, int column) {
-  // intiliases linked list pointer *moves with list of moves that the queen at (row,column) can make.
-  int sign = a[row][column] / (abs(a[row][column]));
+  // initialises linked list pointer 'moves' with list of moves that the queen at (row,column) can make.
+  if(a[row][column] != QUEEN)
+    return;
+  clear_list();
+  if(a[row][column] > 0) {	// if piece is white
+    
+  }
+  else {			// else piece is black
+    
+ }
 }
 
 void moves_of_king(int row, int column) {
-  // intiliases linked list pointer *moves with list of moves that the king at (row,column) can make.
-  int sign = a[row][column] / (abs(a[row][column]));
+  // initialises linked list pointer 'moves' with list of moves that the king at (row,column) can make.
+  if(a[row][column] != KING)
+    return;
+  clear_list();
+  if(a[row][column] > 0) {	// if piece is white
+    
+  }
+  else {			// else piece is black
+    
+ }
 }
 
 
