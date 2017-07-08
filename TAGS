@@ -1,5 +1,5 @@
 
-chess.c,1124
+chess.c,1309
 #define KING	6,81
 #define QUEEN	7,97
 #define ROOK	8,113
@@ -14,36 +14,42 @@ chess.c,1124
 #define SOUTH_WEST	19,295
 #define WEST	20,316
 #define NORTH_WEST	21,332
-#define INVALID	24,389
-#define BOARD_SIZE	25,409
-#define BLANK	26,431
-#define SHOW_VALUES	27,448
-int board[board30,472
-typedef struct node 32,593
-  int row;33,615
-  int column;34,626
-  struct node *next;next35,640
-}move;move36,661
-move *moves moves38,669
-void initialise_board(55,1807
-char pretty_print(66,2131
-void show_board(85,2577
-void read_fen(117,3464
-void clear_moves(170,4730
-void show_moves(179,4865
-void push_move(190,5140
-void change_row_column(200,5397
-void move_in_direction(221,5847
-void move_diagonally(245,6735
-void move_straight(253,7032
-void moves_of_pawn(261,7303
-void moves_of_bishop(287,8513
-void moves_of_knight(293,8715
-void moves_of_rook(334,10862
-void moves_of_queen(340,11058
-void moves_of_king(347,11290
-void solve(389,13443
-int main(397,13542
+#define INVALID	24,388
+#define BOARD_SIZE	25,408
+#define BLANK	26,430
+#define SHOW_VALUES	29,478
+#define SHOW_FEN	30,500
+#define SHOW_KILL	31,519
+#define SHOW_MOVES	32,539
+int board[board34,561
+typedef struct node 36,682
+  int row;37,704
+  int column;38,715
+  struct node *next;next39,729
+}move;move40,750
+move *moves moves42,758
+void initialise_board(59,1896
+char pretty_print(70,2220
+int is_in_moves_list(89,2666
+void show_board(99,2877
+void read_fen(170,4572
+void clear_moves(224,5785
+void translate_move(233,5920
+void show_moves(259,6413
+void push_move(269,6604
+void change_row_column(279,6861
+void move_in_direction(300,7311
+void move_diagonally(324,8199
+void move_straight(332,8496
+void moves_of_pawn(340,8767
+void moves_of_bishop(365,9902
+void moves_of_knight(371,10104
+void moves_of_rook(412,12251
+void moves_of_queen(418,12447
+void moves_of_king(425,12679
+void move_by_row_column 467,14832
+void move_by_notation(496,15353
+int main(540,16013
 
 LICENSE.md,16
 Copyright 3,13
@@ -52,3 +58,5 @@ README.md,46
 This is a relatively simple chess engine,1,0
 
 input.txt,0
+
+a.out,0

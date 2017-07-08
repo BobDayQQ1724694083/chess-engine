@@ -20,12 +20,16 @@
 #define WEST		7
 #define NORTH_WEST	8
 
-// macros for board configurations
+// macros for board configuration
 #define INVALID		42
 #define BOARD_SIZE	12
 #define BLANK		0
-#define SHOW_VALUES	0
 
+// macros that can be toggled
+#define SHOW_VALUES	0
+#define SHOW_FEN	1
+#define SHOW_KILL	1
+#define SHOW_MOVES	1
 
 int board[BOARD_SIZE][BOARD_SIZE]; /* Board representation, white as positive, black as negative, blanks with zeroes */
 
@@ -66,7 +70,7 @@ void initialise_board() {
 char pretty_print(int piece) {
   switch(piece) {
   case INVALID:		return 'X';
-  case BLANK:		return '.';
+  case BLANK:		return '`';
   case PAWN:		return 'P';
   case BISHOP:		return 'B';
   case KNIGHT:		return 'N';
@@ -82,16 +86,37 @@ char pretty_print(int piece) {
   }
 }
 
+int is_in_moves_list(int rownum, int colnum) {
+  move *temp = moves;
+  while(temp != NULL) {
+    if(temp -> row == rownum && temp -> column == colnum)
+      return 1;
+    temp = temp -> next;
+  }
+  return 0;
+}
+
 void show_board() {
   if (SHOW_VALUES) {
+    printf("\n");
     for(int i = 0; i < BOARD_SIZE; i++) {
-      for(int j = 0; j < BOARD_SIZE; j++) 
-	printf("%d\t",board[i][j]);
+      for(int j = 0; j < BOARD_SIZE; j++) {
+	if(SHOW_KILL) {
+	  if(is_in_moves_list(i, j)) {
+	    switch(board[i][j]) {
+	    case BLANK: printf("+\t");
+	      break;
+	    default: printf("#\t");
+	    }
+	  }
+	  else
+	    printf("%d\t",board[i][j]);
+	}
+      }
       printf("\n");
     }
   }
   else {
-    /* make something that will show kill, that is places that are on moves list acc. to level of some macro */
     printf("\n   ");
     for(int i = 2; i < (BOARD_SIZE - 2); i++)
       printf("%c  ", (i+95));
@@ -100,10 +125,10 @@ void show_board() {
       printf("--");
     printf("\n");
     for(int i = 2; i < (BOARD_SIZE - 2); i++) {
-      printf("%d |", 10 - i);
+      printf("%d |", (BOARD_SIZE - 2) - i);
       for(int j = 2; j < (BOARD_SIZE - 2); j++)
 	printf("%c| ",pretty_print(board[i][j]));
-      printf("%d\n", 10 - i);
+      printf("%d\n", (BOARD_SIZE - 2) - i);
     }
     printf("  ");
     for(int i = 2; i < (BOARD_SIZE - 2); i++)
@@ -111,14 +136,43 @@ void show_board() {
     printf("\n   ");
     for(int i = 2; i < (BOARD_SIZE - 2); i++)
       printf("%c  ", (i+95));
+    
+    if(SHOW_KILL) {
+      printf("\n  ");
+      for(int i = 2; i < 14; i++)
+	printf("--");
+      printf("\n");
+      for(int i = 2; i < (BOARD_SIZE - 2); i++) {
+	printf("%d |", (BOARD_SIZE - 2) - i);
+	for(int j = 2; j < (BOARD_SIZE - 2); j++) {
+	  if(is_in_moves_list(i, j)) {
+	    switch(board[i][j]) {
+	    case BLANK: printf("+| ");
+	      break;
+	    default: printf("#| ");
+	    }
+	  }
+	  else
+	    printf("%c| ",pretty_print(board[i][j]));
+	}
+	printf("%d\n", (BOARD_SIZE - 2) - i);
+      }
+      printf("  ");
+      for(int i = 2; i < (BOARD_SIZE - 2); i++)
+	printf("---");
+      printf("\n   ");
+      for(int i = 2; i < (BOARD_SIZE - 2); i++)
+	printf("%c  ", (i+95));
+    }
   }
 }
 
 void read_fen() {
-  // make macro for showing FEN, shift all additional verbosity onto macros
   char str[64];
   fgets(str, 64, stdin);
-  fprintf(stdout, "FEN: %s", str);
+  if(SHOW_FEN) {
+    fprintf(stdout, "FEN: %s", str);
+  }
   for (int i = 0, row = 2, column = 2; i < strlen(str); i++ ) {
     char ch = str[i];
     if(ch == '/') {
@@ -176,13 +230,38 @@ void clear_moves() {
   }
 }
 
+void translate_move(int row, int column) {
+  if(SHOW_MOVES) {
+    switch(column) {
+    case 2: printf("a");
+      break;
+    case 3: printf("b");
+      break;
+    case 4: printf("c");
+      break;
+    case 5: printf("d");
+      break;
+    case 6: printf("e");
+      break;
+    case 7: printf("f");
+      break;
+    case 8: printf("g");
+      break;
+    case 9: printf("h");
+      break;
+    }
+    printf("%d ", (BOARD_SIZE - 2) - row);
+  }
+  else
+    printf("%d-%d ", row - 1, column - 1);
+}
+
 void show_moves() {
-  /* make a macro to toggle between actual values and pretty values */
-  move *temp = moves;
+   move *temp = moves;
   if(temp != NULL)
     printf("\nmoves: ");
   while(temp != NULL) {
-    printf("%d-%d ",(temp -> column) - 1, (temp -> row) - 1);
+    translate_move(temp-> row, temp -> column);
     temp = temp -> next;
   }
 }
@@ -260,8 +339,7 @@ void move_straight(int row, int column) {
 
 void moves_of_pawn(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the pawn at (row,column) can make.
-  // make an improvement to make pawns run fast from their initial positions
-  clear_moves();
+    clear_moves();
   if(board[row][column] > 0) {	// if piece is white
     if(board[row - 1][column] == BLANK) 
       push_move(row - 1, column);
@@ -386,12 +464,77 @@ void moves_of_king(int row, int column) {
   }
 }
 
-void solve() {
-  int x = 7;
-  int y = 4;
-  moves_of_pawn(x+1, y+1);
-  show_moves();
-  puts("");
+void move_by_row_column (int row, int column) {
+  switch(board[row][column]) {
+  case PAWN:
+  case -PAWN:
+    moves_of_pawn(row, column);
+    break;
+  case BISHOP:
+  case -BISHOP:
+    moves_of_bishop(row, column);
+    break;
+  case KNIGHT:
+  case -KNIGHT:
+    moves_of_knight(row, column);
+    break;
+  case ROOK:
+  case -ROOK:
+    moves_of_rook(row, column);
+    break;
+  case QUEEN:
+  case -QUEEN:
+    moves_of_queen(row, column);
+    break;
+  case KING:
+  case -KING:
+    moves_of_king(row, column);
+    break;
+  }
+}
+
+void move_by_notation(char *str) {
+  int row = 0, column = 0;
+  switch(str[0]) {
+  case 'a':
+  case 'A':
+    column = 2;
+    break;
+  case 'b':
+  case 'B':
+    column = 3;
+    break;
+  case 'c':
+  case 'C':
+    column = 4;
+    break;
+  case 'd':
+  case 'D':
+    column = 5;
+    break;
+  case 'e':
+  case 'E':
+    column = 6;
+    break;
+  case 'f':
+  case 'F':
+    column = 7;
+    break;
+  case 'g':
+  case 'G':
+    column = 8;
+    break;
+  case 'h':
+  case 'H':
+    column = 9;
+    break;
+  }
+  if(str[1] > 48 && str[1] < 57) {
+    row = str[1] - '0';
+    row = (BOARD_SIZE - 2) - row;
+  }
+  if(row != 0 && column != 0)
+    move_by_row_column(row, column);
 }
 
 int main() {
@@ -399,8 +542,9 @@ int main() {
   initialise_board();
   read_fen();
 
-  solve();
-    
+  move_by_notation("f4");
+
+  show_moves();
   show_board();
   return 1;
 }
