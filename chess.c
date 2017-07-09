@@ -1,3 +1,4 @@
+/* Copyright (c) 2017 Rajat Pundir */
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
@@ -34,17 +35,18 @@
 int board[BOARD_SIZE][BOARD_SIZE]; /* Board representation, white as positive, black as negative, blanks with zeroes */
 
 typedef struct node {
-  int row;
-  int column;
+  int piece;
+  int from_row;
+  int from_column;
+  int to_row;
+  int to_column;
   struct node *next;
 }move;
 
 move *moves = NULL;
 
 /* 
-   Just watch the sign of a piece, move in each direction you can until non-zeroes are obstructions, opposite signs are possible captures.
-   If you move a piece, place zero at that position, and place it where you can, make a list of moves if you need that for later use.
-   TODO. Make functions for all eight directions, each function should return last non-zero position, meaning border or piece position.Each function should take a starting position, and number of moves allowed before exhaustion. Knight can be given a special L function, which takes a direction and return a pointer to list of moves it can make. But, then eight direction functions will be helper functions to major peice functions.
+   Some documentation goes here.
 
    Note.
    KING.   Allowed to move one step in eight directions.
@@ -89,7 +91,7 @@ char pretty_print(int piece) {
 int is_in_moves_list(int rownum, int colnum) {
   move *temp = moves;
   while(temp != NULL) {
-    if(temp -> row == rownum && temp -> column == colnum)
+    if(temp -> to_row == rownum && temp -> to_column == colnum)
       return 1;
     temp = temp -> next;
   }
@@ -137,7 +139,7 @@ void show_board() {
     for(int i = 2; i < (BOARD_SIZE - 2); i++)
       printf("%c  ", (i+95));
     
-    if(SHOW_KILL) {
+    if(SHOW_KILL && moves != NULL) {
       printf("\n  ");
       for(int i = 2; i < 14; i++)
 	printf("--");
@@ -230,48 +232,32 @@ void clear_moves() {
   }
 }
 
-void translate_move(int row, int column) {
-  if(SHOW_MOVES) {
-    switch(column) {
-    case 2: printf("a");
-      break;
-    case 3: printf("b");
-      break;
-    case 4: printf("c");
-      break;
-    case 5: printf("d");
-      break;
-    case 6: printf("e");
-      break;
-    case 7: printf("f");
-      break;
-    case 8: printf("g");
-      break;
-    case 9: printf("h");
-      break;
-    }
-    printf("%d ", (BOARD_SIZE - 2) - row);
-  }
+void translate_move(int piece, int from_row, int from_column, int to_row, int to_column) {
+  if(SHOW_MOVES)
+    printf("%c%c%d-%c%c%d ", pretty_print(piece), from_column + 95, (BOARD_SIZE - 2) - from_row, pretty_print(piece), to_column + 95, (BOARD_SIZE - 2) - to_row);
   else
-    printf("%d-%d ", row - 1, column - 1);
+    printf("r%d-c%d ", to_row, to_column);
 }
 
 void show_moves() {
-   move *temp = moves;
+  move *temp = moves;
   if(temp != NULL)
     printf("\nmoves: ");
   while(temp != NULL) {
-    translate_move(temp-> row, temp -> column);
+    translate_move(temp -> piece, temp -> from_row, temp -> from_column, temp -> to_row, temp -> to_column);
     temp = temp -> next;
   }
 }
 
-void push_move(int rownum, int colnum) {
-  if (board[rownum][colnum] == INVALID) // discard invalid moves
+void push_move(int piece, int from_rownum, int from_colnum, int to_rownum, int to_colnum) {
+  if (board[to_rownum][to_colnum] == INVALID) // discard invalid moves
     return;
   move *temp = (move *)malloc(sizeof(move));
-  temp -> row = rownum;
-  temp -> column = colnum;
+  temp -> piece = piece;
+  temp -> from_row = from_rownum;
+  temp -> from_column = from_colnum;
+  temp -> to_row = to_rownum;
+  temp -> to_column = to_colnum;
   temp -> next = moves;
   moves = temp;
 }
@@ -299,24 +285,25 @@ void change_row_column(int *row, int *column, int *direction) {
 
 void move_in_direction(int row, int column, int direction) {
   // This function is designed to be used for bishops, rooks and queens.
+  int piece = board[row][column], from_row = row, from_column = column;
   if(board[row][column] > 0) {	// if piece is white
     while(board[row][column] != INVALID) {
+      change_row_column(&row, &column, &direction); // move to next position
       if(board[row][column] > 0)	// break if piece was of same color
 	break;
-      push_move(row, column);
+      push_move(piece, from_row, from_column, row, column);
       if(board[row][column] < 0)	// break if piece was of opposite color
 	break;
-      change_row_column(&row, &column, &direction); // move to next position
     }
   }
   else if(board[row][column] < 0) {     // else piece is black
     while(board[row][column] != INVALID) {
+      change_row_column(&row, &column, &direction); // move to next position
       if(board[row][column] < 0)	// break if piece was of same color
 	break;
-      push_move(row, column);
+      push_move(piece, from_row, from_column, row, column);
       if(board[row][column] > 0)	// break if piece was of opposite color
 	break;
-      change_row_column(&row, &column, &direction); // move to next position
     }
   }
 }
@@ -339,26 +326,27 @@ void move_straight(int row, int column) {
 
 void moves_of_pawn(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the pawn at (row,column) can make.
-    clear_moves();
+  clear_moves();
   if(board[row][column] > 0) {	// if piece is white
     if(board[row - 1][column] == BLANK) 
-      push_move(row - 1, column);
+      push_move(PAWN, row, column, row - 1, column);
     if(row == 8 && board[row - 2][column] == BLANK) /* initial case for a pawn */
-      push_move(row - 2, column);
+      push_move(PAWN, row, column, row - 2, column);
     if(board[row - 1][column - 1] < 0 && board[row - 1][column - 1] != BLANK)
-      push_move(row - 1, column - 1);
+      push_move(PAWN, row, column, row - 1, column - 1);
+
     if(board[row - 1][column + 1] < 0  && board[row - 1][column + 1] != BLANK)
-      push_move(row - 1, column + 1);
+      push_move(PAWN, row, column, row - 1, column + 1);
   }
   else if(board[row][column] < 0) {			// else piece is black
     if(board[row + 1][column] == BLANK)
-      push_move(row + 1, column);
+      push_move(-PAWN, row, column, row + 1, column);
     if(row == 3 && board[row + 2][column] == BLANK) /* initial case for a pawn */
-      push_move(row + 2, column);
+      push_move(-PAWN, row, column, row + 2, column);
     if(board[row + 1][column - 1] > 0 && board[row + 1][column - 1] != BLANK)
-      push_move(row + 1, column - 1);
+      push_move(-PAWN, row, column, row + 1, column - 1);
     if(board[row + 1][column + 1] > 0 && board[row + 1][column + 1] != BLANK)
-      push_move(row + 1, column + 1);
+      push_move(-PAWN, row, column, row + 1, column + 1);
   }
 }
 
@@ -373,39 +361,39 @@ void moves_of_knight(int row, int column) {
   clear_moves();
   if(board[row][column] > 0) {	// if piece is white
     if(board[row - 1][column - 2] == BLANK || board[row - 1][column - 2] < 0)
-      push_move(row - 1, column - 2);
+      push_move(KNIGHT, row, column, row - 1, column - 2);
     if(board[row - 1][column + 2] == BLANK || board[row - 1][column + 2] < 0)
-      push_move(row - 1, column + 2);
+      push_move(KNIGHT, row, column, row - 1, column + 2);
     if(board[row - 2][column - 1] == BLANK || board[row - 2][column - 1] < 0)
-      push_move(row - 2, column - 1);
+      push_move(KNIGHT, row, column, row - 2, column - 1);
     if(board[row - 2][column + 1] == BLANK || board[row - 2][column + 1] < 0)
-      push_move(row - 2, column + 1);
+      push_move(KNIGHT, row, column, row - 2, column + 1);
     if(board[row + 1][column - 2] == BLANK || board[row + 1][column - 2] < 0)
-      push_move(row + 1, column - 2);
+      push_move(KNIGHT, row, column, row + 1, column - 2);
     if(board[row + 1][column + 2] == BLANK || board[row + 1][column + 2] < 0)
-      push_move(row + 1, column + 2);
+      push_move(KNIGHT, row, column, row + 1, column + 2);
     if(board[row + 2][column - 1] == BLANK || board[row + 2][column - 1] < 0)
-      push_move(row + 2, column - 1);
+      push_move(KNIGHT, row, column, row + 2, column - 1);
     if(board[row + 2][column + 1] == BLANK || board[row + 2][column + 1] < 0)
-      push_move(row + 2, column + 1);
+      push_move(KNIGHT, row, column, row + 2, column + 1);
   }
   else if(board[row][column] < 0) {			// else piece is black
     if(board[row - 1][column - 2] == BLANK || board[row - 1][column - 2] > 0)
-      push_move(row - 1, column - 2);
+      push_move(-KNIGHT, row, column, row - 1, column - 2);
     if(board[row - 1][column + 2] == BLANK || board[row - 1][column + 2] > 0)
-      push_move(row - 1, column + 2);
+      push_move(-KNIGHT, row, column, row - 1, column + 2);
     if(board[row - 2][column - 1] == BLANK || board[row - 2][column - 1] > 0)
-      push_move(row - 2, column - 1);
+      push_move(-KNIGHT, row, column, row - 2, column - 1);
     if(board[row - 2][column + 1] == BLANK || board[row - 2][column + 1] > 0)
-      push_move(row - 2, column + 1);
+      push_move(-KNIGHT, row, column, row - 2, column + 1);
     if(board[row + 1][column - 2] == BLANK || board[row + 1][column - 2] > 0)
-      push_move(row + 1, column - 2);
+      push_move(-KNIGHT, row, column, row + 1, column - 2);
     if(board[row + 1][column + 2] == BLANK || board[row + 1][column + 2] > 0)
-      push_move(row + 1, column + 2);
+      push_move(-KNIGHT, row, column, row + 1, column + 2);
     if(board[row + 2][column - 1] == BLANK || board[row + 2][column - 1] > 0)
-      push_move(row + 2, column - 1);
+      push_move(-KNIGHT, row, column, row + 2, column - 1);
     if(board[row + 2][column + 1] == BLANK || board[row + 2][column + 1] > 0)
-      push_move(row + 2, column + 1);
+      push_move(-KNIGHT, row, column, row + 2, column + 1);
   }
 }
 
@@ -423,44 +411,44 @@ void moves_of_queen(int row, int column) {
 }
 
 void moves_of_king(int row, int column) {
+  /* write a not_in_danger function which detects if a piece will be in danger if it is put at (row,column) */
   // initialises linked list pointer 'moves' with list of moves that the king at (row,column) can make.
-  // this function needs some work afterwards, like king can't take a piece which will put it in a check.
   clear_moves();
   if(board[row][column] > 0) {	// if piece is white
     if(board[row - 1][column] == BLANK || board[row - 1][column] < 0)
-      push_move(row - 1, column);
+      push_move(KING, row, column, row - 1, column);
     if(board[row - 1][column - 1] == BLANK || board[row - 1][column - 1] < 0)
-      push_move(row - 1, column - 1);
+      push_move(KING, row, column, row - 1, column - 1);
     if(board[row - 1][column + 1] == BLANK || board[row - 1][column + 1] < 0)
-      push_move(row - 1, column + 1);
+      push_move(KING, row, column, row - 1, column + 1);
     if(board[row][column - 1] == BLANK || board[row][column - 1] < 0)
-      push_move(row, column - 1);
+      push_move(KING, row, column, row, column - 1);
     if(board[row][column + 1] == BLANK || board[row][column + 1] < 0)
-      push_move(row, column + 1);
+      push_move(KING, row, column, row, column + 1);
     if(board[row + 1][column] == BLANK || board[row + 1][column] < 0)
-      push_move(row + 1, column);
+      push_move(KING, row, column, row + 1, column);
     if(board[row + 1][column - 1] == BLANK || board[row + 1][column - 1] < 0)
-      push_move(row + 1, column - 1);
+      push_move(KING, row, column, row + 1, column - 1);
     if(board[row + 1][column + 1] == BLANK || board[row + 1][column + 1] < 0)
-      push_move(row + 1, column + 1);
+      push_move(KING, row, column, row + 1, column + 1);
   }
   else if(board[row][column] < 0) {			// else piece is black
     if(board[row - 1][column] == BLANK || board[row - 1][column] > 0)
-      push_move(row - 1, column);
+      push_move(-KING, row, column, row - 1, column);
     if(board[row - 1][column - 1] == BLANK || board[row - 1][column - 1] > 0)
-      push_move(row - 1, column - 1);
+      push_move(-KING, row, column, row - 1, column - 1);
     if(board[row - 1][column + 1] == BLANK || board[row - 1][column + 1] > 0)
-      push_move(row - 1, column + 1);
+      push_move(-KING, row, column, row - 1, column + 1);
     if(board[row][column - 1] == BLANK || board[row][column - 1] > 0)
-      push_move(row, column - 1);
+      push_move(-KING, row, column, row, column - 1);
     if(board[row][column + 1] == BLANK || board[row][column + 1] > 0)
-      push_move(row, column + 1);
+      push_move(-KING, row, column, row, column + 1);
     if(board[row + 1][column] == BLANK || board[row + 1][column] > 0)
-      push_move(row + 1, column);
+      push_move(-KING, row, column, row + 1, column);
     if(board[row + 1][column - 1] == BLANK || board[row + 1][column - 1] > 0)
-      push_move(row + 1, column - 1);
+      push_move(-KING, row, column, row + 1, column - 1);
     if(board[row + 1][column + 1] == BLANK || board[row + 1][column + 1] > 0)
-      push_move(row + 1, column + 1);
+      push_move(-KING, row, column, row + 1, column + 1);
   }
 }
 
@@ -541,8 +529,8 @@ int main() {
   freopen("input.txt", "r", stdin);
   initialise_board();
   read_fen();
-
-  move_by_notation("f4");
+  
+  move_by_notation("c3");
 
   show_moves();
   show_board();
