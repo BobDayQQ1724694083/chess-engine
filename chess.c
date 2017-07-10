@@ -31,10 +31,12 @@
 #define SHOW_FEN	1
 #define SHOW_KILL	1
 #define SHOW_MOVES	1
+#define SHOW_DANGERS	1
 
 int board[BOARD_SIZE][BOARD_SIZE]; /* Board representation, white as positive, black as negative, blanks with zeroes */
 
 typedef struct node {
+  /* Please note the structure is used differently for moves and dangers list */
   int piece;
   int from_row;
   int from_column;
@@ -43,9 +45,14 @@ typedef struct node {
   struct node *next;
 }move;
 
-move *moves = NULL;
+move *moves = NULL, *dangers = NULL;
 
-/* 
+/*
+  Note.
+  1. Add danger awareness to moves_of_king() 
+  2. Apply some pretty printing with SHOW_DANGERS macro
+  3. Maybe a verbose analyse level for pretty printing of SHOW_DANGERS macro
+  
    Some documentation goes here.
 
    Note.
@@ -92,6 +99,16 @@ int is_in_moves_list(int rownum, int colnum) {
   move *temp = moves;
   while(temp != NULL) {
     if(temp -> to_row == rownum && temp -> to_column == colnum)
+      return 1;
+    temp = temp -> next;
+  }
+  return 0;
+}
+
+int is_in_dangers_list(int rownum, int colnum) {
+  move *temp = dangers;
+  while(temp != NULL) {
+    if(temp -> from_row == rownum && temp -> from_column == colnum)
       return 1;
     temp = temp -> next;
   }
@@ -232,11 +249,27 @@ void clear_moves() {
   }
 }
 
+void clear_dangers() {
+  move *temp = NULL;
+  while(dangers != NULL) {
+    temp = dangers;
+    dangers = dangers -> next;
+    free(temp);
+  }
+}
+
 void translate_move(int piece, int from_row, int from_column, int to_row, int to_column) {
   if(SHOW_MOVES)
     printf("%c%c%d-%c%c%d ", pretty_print(piece), from_column + 95, (BOARD_SIZE - 2) - from_row, pretty_print(piece), to_column + 95, (BOARD_SIZE - 2) - to_row);
   else
     printf("r%d-c%d ", to_row, to_column);
+}
+
+void translate_danger(int piece, int from_row, int from_column, int to_row, int to_column) {
+  if(SHOW_DANGERS)
+    printf("%c%c%d ->> %c%d ", pretty_print(piece), from_column + 95, (BOARD_SIZE - 2) - from_row, to_column + 95, (BOARD_SIZE - 2) - to_row);
+  else
+    printf("r%d-c%d ->> r%dc%d ", from_row, from_column, to_row, to_column);
 }
 
 void show_moves() {
@@ -249,6 +282,17 @@ void show_moves() {
   }
 }
 
+void show_dangers() {
+  move *temp = dangers;
+  if(temp != NULL)
+    printf("\ndangers: ");
+  while(temp != NULL) {
+    translate_danger(temp -> piece, temp -> from_row, temp -> from_column, temp -> to_row, temp -> to_column);
+    temp = temp -> next;
+  }
+}
+
+
 void push_move(int piece, int from_rownum, int from_colnum, int to_rownum, int to_colnum) {
   if (board[to_rownum][to_colnum] == INVALID) // discard invalid moves
     return;
@@ -260,6 +304,19 @@ void push_move(int piece, int from_rownum, int from_colnum, int to_rownum, int t
   temp -> to_column = to_colnum;
   temp -> next = moves;
   moves = temp;
+}
+
+void push_danger(int piece, int from_rownum, int from_colnum, int to_rownum, int to_colnum) {
+  if (board[to_rownum][to_colnum] == INVALID) // discard invalid dangers
+    return;
+  move *temp = (move *)malloc(sizeof(move));
+  temp -> piece = piece;
+  temp -> from_row = from_rownum;
+  temp -> from_column = from_colnum;
+  temp -> to_row = to_rownum;
+  temp -> to_column = to_colnum;
+  temp -> next = dangers;
+  dangers = temp;
 }
 
 void change_row_column(int *row, int *column, int *direction) {
@@ -324,6 +381,198 @@ void move_straight(int row, int column) {
   move_in_direction(row, column, WEST);
 }
 
+void move_in_direction_of_danger(int piece, int row, int column, int direction) {
+  // This function is designed to detect dangers from enemy king, bishops, rooks and queens.
+  int to_row = row, to_column = column;
+  if(piece > 0) {	// if piece is white
+    while(board[row][column] != INVALID) {
+      change_row_column(&row, &column, &direction); // move to next position
+      if(board[row][column] > 0)	// break if piece at (row, column) is blocking dangers
+	break;
+      if(board[row][column] < 0) {	// break after pushing danger
+	switch(direction) {
+	case NORTH:
+	case SOUTH:
+	case EAST:
+	case WEST:
+	  switch(board[row][column]) {
+	    // dangers by enemy king, queens, and rooks
+	  case -KING:
+	    switch(direction) {
+	    case NORTH:
+	    case SOUTH:
+	      if(abs(row - to_row) == 1)
+		push_danger(board[row][column], row, column, to_row, to_column);
+	      break;
+	    case EAST:
+	    case WEST:
+	      if(abs(column - to_column) == 1)
+		push_danger(board[row][column], row, column, to_row, to_column);
+	      break;
+	    }
+	    break;
+	  case -QUEEN:
+	  case -ROOK:
+	    push_danger(board[row][column], row, column, to_row, to_column);
+	    break;
+	  }
+	  break;
+	case SOUTH_EAST:
+	case SOUTH_WEST:
+	case NORTH_EAST:
+	case NORTH_WEST:
+	  switch(board[row][column]) {
+	    // dangers by enemy king, queens and bishops
+	  case -KING:
+	  case -PAWN:
+	    switch(direction) {
+	    case SOUTH_EAST:
+	    case SOUTH_WEST:
+	      if(board[row][column] == -KING)
+	        if(abs(row - to_row) == 1 && abs(column - to_column) == 1)
+		  push_danger(board[row][column], row, column, to_row, to_column);	  
+	      break;
+	      // North-East and North-West options are valid only for White pieces.
+	      // Options for Black pieces will be South-East and South-West.
+	    case NORTH_EAST:
+	    case NORTH_WEST:
+	      if(abs(row - to_row) == 1 && abs(column - to_column) == 1)
+		push_danger(board[row][column], row, column, to_row, to_column);	  
+	      break;
+	    }
+	    break;
+	  case -QUEEN:
+	  case -BISHOP:
+	    push_danger(board[row][column], row, column, to_row, to_column);
+	    break;
+	  }
+	  break;
+	}
+	break;			/* break after pushing danger */
+      }
+    }
+  }
+  else if(piece < 0) {     // else piece is black
+    while(board[row][column] != INVALID) {
+      change_row_column(&row, &column, &direction); // move to next position
+      if(board[row][column] < 0)	// break if piece at (row, column) is blocking dangers
+	break;
+      if(board[row][column] > 0) {	// break after pushing danger
+	switch(direction) {
+	case NORTH:
+	case SOUTH:
+	case EAST:
+	case WEST:
+	  switch(board[row][column]) {
+	    // dangers by enemy king, queens, and rooks
+	  case KING:
+	    switch(direction) {
+	    case NORTH:
+	    case SOUTH:
+	      if(abs(row - to_row) == 1)
+		push_danger(board[row][column], row, column, to_row, to_column);
+	      break;
+	    case EAST:
+	    case WEST:
+	      if(abs(column - to_column) == 1)
+		push_danger(board[row][column], row, column, to_row, to_column);
+	      break;
+	    }
+	    break;
+	  case QUEEN:
+	  case ROOK:
+	    push_danger(board[row][column], row, column, to_row, to_column);
+	    break;
+	  }
+	  break;
+	case SOUTH_EAST:
+	case SOUTH_WEST:
+	case NORTH_EAST:
+	case NORTH_WEST:
+	  switch(board[row][column]) {
+	    // dangers by enemy king, queens and bishops
+	  case KING:
+	  case PAWN:
+	    switch(direction) {
+	    case NORTH_EAST:
+	    case NORTH_WEST:
+	      if(board[row][column] == KING)
+	        if(abs(row - to_row) == 1 && abs(column - to_column) == 1)
+		  push_danger(board[row][column], row, column, to_row, to_column);	  
+	      break;
+	      // South-East and South-West options are valid only for Black pieces.
+	      // Options for White pieces will be North-East and North-West.
+	    case SOUTH_EAST:
+	    case SOUTH_WEST:
+	      if(abs(row - to_row) == 1 && abs(column - to_column) == 1)
+		push_danger(board[row][column], row, column, to_row, to_column);	  
+	      break;
+	    }
+	    break;
+	  case QUEEN:
+	  case BISHOP:
+	    push_danger(board[row][column], row, column, to_row, to_column);
+	    break;
+	  }
+	  break;
+	}
+	break;			/* break after pushing danger */
+      }
+    }
+  }
+}
+
+void danger_by_row_column(int piece, int row, int column) {
+  // initialises linked list pointer 'dangers' with list of dangers that await for 'piece' if it is placed at (row, column)
+  clear_dangers();
+  // dangers from enemy king, rooks, bishops, queens, and pawns.
+  move_in_direction_of_danger(piece, row, column, NORTH);
+  move_in_direction_of_danger(piece, row, column, EAST);
+  move_in_direction_of_danger(piece, row, column, SOUTH);
+  move_in_direction_of_danger(piece, row, column, WEST);
+  move_in_direction_of_danger(piece, row, column, NORTH_EAST);
+  move_in_direction_of_danger(piece, row, column, SOUTH_EAST);
+  move_in_direction_of_danger(piece, row, column, NORTH_WEST);
+  move_in_direction_of_danger(piece, row, column, SOUTH_WEST);
+  // dangers from enemy knight
+  if(piece > 0) {	      // if piece is white
+    if(board[row - 1][column - 2] == -KNIGHT)
+      push_danger(-KNIGHT, row - 1, column - 2, row, column);
+    if(board[row - 1][column + 2] == -KNIGHT)
+      push_danger(-KNIGHT, row - 1, column + 2, row, column);
+    if(board[row - 2][column - 1] == -KNIGHT)
+      push_danger(-KNIGHT, row - 2, column - 1, row, column);
+    if(board[row - 2][column + 1] == -KNIGHT)
+      push_danger(-KNIGHT, row - 2, column + 1, row, column);
+    if(board[row + 1][column - 2] == -KNIGHT)
+      push_danger(-KNIGHT, row + 1, column - 2, row, column);
+    if(board[row + 1][column + 2] == -KNIGHT)
+      push_danger(-KNIGHT, row + 1, column + 2, row, column);
+    if(board[row + 2][column - 1] == -KNIGHT)
+      push_danger(-KNIGHT, row + 2, column - 1, row, column);
+    if(board[row + 2][column + 1] == -KNIGHT)
+      push_danger(-KNIGHT, row + 2, column + 1, row, column);
+  }
+  else if(piece < 0) {	      // else piece is black
+    if(board[row - 1][column - 2] == KNIGHT)
+      push_danger(KNIGHT, row - 1, column - 2, row, column);
+    if(board[row - 1][column + 2] == KNIGHT)
+      push_danger(KNIGHT, row - 1, column + 2, row, column);
+    if(board[row - 2][column - 1] == KNIGHT)
+      push_danger(KNIGHT, row - 2, column - 1, row, column);
+    if(board[row - 2][column + 1] == KNIGHT)
+      push_danger(KNIGHT, row - 2, column + 1, row, column);
+    if(board[row + 1][column - 2] == KNIGHT)
+      push_danger(KNIGHT, row + 1, column - 2, row, column);
+    if(board[row + 1][column + 2] == KNIGHT)
+      push_danger(KNIGHT, row + 1, column + 2, row, column);
+    if(board[row + 2][column - 1] == KNIGHT)
+      push_danger(KNIGHT, row + 2, column - 1, row, column);
+    if(board[row + 2][column + 1] == KNIGHT)
+      push_danger(KNIGHT, row + 2, column + 1, row, column);
+  }
+}
+
 void moves_of_pawn(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the pawn at (row,column) can make.
   clear_moves();
@@ -334,7 +583,6 @@ void moves_of_pawn(int row, int column) {
       push_move(PAWN, row, column, row - 2, column);
     if(board[row - 1][column - 1] < 0 && board[row - 1][column - 1] != BLANK)
       push_move(PAWN, row, column, row - 1, column - 1);
-
     if(board[row - 1][column + 1] < 0  && board[row - 1][column + 1] != BLANK)
       push_move(PAWN, row, column, row - 1, column + 1);
   }
@@ -359,7 +607,7 @@ void moves_of_bishop(int row, int column) {
 void moves_of_knight(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the knight at (row,column) can make.
   clear_moves();
-  if(board[row][column] > 0) {	// if piece is white
+  if(board[row][column] > 0) {	                        // if piece is white
     if(board[row - 1][column - 2] == BLANK || board[row - 1][column - 2] < 0)
       push_move(KNIGHT, row, column, row - 1, column - 2);
     if(board[row - 1][column + 2] == BLANK || board[row - 1][column + 2] < 0)
@@ -523,6 +771,98 @@ void move_by_notation(char *str) {
   }
   if(row != 0 && column != 0)
     move_by_row_column(row, column);
+}
+
+void danger_by_notation(int piece, char *str) {
+  int row = 0, column = 0;
+  switch(str[0]) {
+  case 'a':
+  case 'A':
+    column = 2;
+    break;
+  case 'b':
+  case 'B':
+    column = 3;
+    break;
+  case 'c':
+  case 'C':
+    column = 4;
+    break;
+  case 'd':
+  case 'D':
+    column = 5;
+    break;
+  case 'e':
+  case 'E':
+    column = 6;
+    break;
+  case 'f':
+  case 'F':
+    column = 7;
+    break;
+  case 'g':
+  case 'G':
+    column = 8;
+    break;
+  case 'h':
+  case 'H':
+    column = 9;
+    break;
+  }
+  if(str[1] > 48 && str[1] < 57) {
+    row = str[1] - '0';
+    row = (BOARD_SIZE - 2) - row;
+  }
+  if(row != 0 && column != 0)
+    danger_by_row_column(piece, row, column);
+}
+
+void danger_on_oneself(int row, int column) {
+  danger_by_row_column(board[row][column], row, column);
+}
+
+void danger_on_oneself_by_notation(char *str) {
+  int row = 0, column = 0;
+  switch(str[0]) {
+  case 'a':
+  case 'A':
+    column = 2;
+    break;
+  case 'b':
+  case 'B':
+    column = 3;
+    break;
+  case 'c':
+  case 'C':
+    column = 4;
+    break;
+  case 'd':
+  case 'D':
+    column = 5;
+    break;
+  case 'e':
+  case 'E':
+    column = 6;
+    break;
+  case 'f':
+  case 'F':
+    column = 7;
+    break;
+  case 'g':
+  case 'G':
+    column = 8;
+    break;
+  case 'h':
+  case 'H':
+    column = 9;
+    break;
+  }
+  if(str[1] > 48 && str[1] < 57) {
+    row = str[1] - '0';
+    row = (BOARD_SIZE - 2) - row;
+  }
+  if(row != 0 && column != 0)
+    danger_on_oneself(row, column);
 }
 
 int main() {
