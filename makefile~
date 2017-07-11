@@ -1,2 +1,0 @@
-chess : chess.c
-	cc chess.c && ./chess
