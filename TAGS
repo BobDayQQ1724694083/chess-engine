@@ -40,51 +40,53 @@ typedef struct node 49,1023
   struct node *next;next56,1206
 }move;move57,1227
 move *moves moves59,1235
-void initialise_board(171,6074
-char pretty_print(183,6478
-char* pretty_print_full_name(203,7091
-int is_in_moves_list(223,7830
-int is_in_dangers_list(234,8097
-void show_board(245,8374
-void read_fen(338,10780
-int sign_of_piece(393,12059
-void clear_moves(400,12218
-void clear_dangers(410,12377
-void translate_move(420,12548
-void translate_danger(428,12974
-void show_moves(436,13439
-void show_dangers(447,13724
-void push_move(469,14421
-void push_danger(487,15163
-void change_row_column(501,15631
-void move_in_direction(523,16156
-void move_diagonally(548,17204
-void move_straight(556,17489
-void move_in_direction_of_danger(564,17750
-void danger_by_row_column(705,21920
-void remove_unsafe_moves(756,24488
-void moves_of_pawn(780,25466
-void moves_of_bishop(807,26791
-void moves_of_knight(815,27013
-void moves_of_rook(839,28693
-void moves_of_queen(847,28907
-void moves_of_king(856,29156
-void move_by_row_column 880,30831
-void set_row_column_by_notation(910,31396
-void move_by_notation(952,32060
-void danger_by_notation(960,32319
-void danger_on_oneself(968,32602
-void danger_on_oneself_by_notation(973,32792
-int main(982,33099
+void initialise_board(178,6682
+char pretty_print(190,7086
+char* pretty_print_full_name(210,7699
+int is_in_moves_list(230,8438
+int is_in_dangers_list(241,8719
+void show_board(252,9008
+void read_fen(345,11414
+int sign_of_piece(400,12692
+void clear_moves(407,12851
+void clear_dangers(417,13010
+void translate_move(427,13181
+void translate_danger(435,13607
+void show_moves(443,14072
+void show_dangers(454,14357
+void push_move(476,15054
+void push_danger(494,15796
+void change_row_column(508,16264
+void move_in_direction(530,16789
+void move_diagonally(555,17837
+void move_straight(563,18122
+void move_in_direction_of_danger(571,18383
+void danger_by_row_column(712,22553
+void remove_unsafe_moves(744,24356
+void moves_of_pawn(768,25334
+void moves_of_bishop(795,26659
+void moves_of_knight(803,26881
+void moves_of_rook(827,28561
+void moves_of_queen(835,28775
+void moves_of_king(844,29024
+void move_by_row_column 868,30700
+void set_row_column_by_notation(898,31265
+void move_by_notation(940,31929
+void danger_by_notation(948,32188
+void danger_on_oneself(956,32471
+void danger_on_oneself_by_notation(961,32661
+int main(970,32968
 
 LICENSE.md,16
 Copyright 3,13
 
-README.md,46
+README.md,341
 This is a relatively simple chess engine,1,0
-
-makefile~,0
+Someday,2,111
+There is further scope of improvement like: Castling,4,183
+There is further scope of improvement like: Castling, Stalemate,4,183
+There is further scope of improvement like: Castling, Stalemate, En Passant,4,183
+Further,5,275
+Further, pieces can be made wise in general,5,275
 
 input.txt,0
-
-a.out,0
