@@ -102,9 +102,9 @@ move *moves = NULL, *dangers = NULL;
   3. char* pretty_print_full_name
   this returns full name of a piece.
   4. int is_in_moves_list
-  returns count of moves in global moves list.
+  returns 1 if move is in moves list otherwise returns zero.
   5. int is_in_dangers_list
-  returns count of moves in global dangers list.
+  returns 1 if move is in dangers list otherwise returns zero.
   6. show_board
   this shows the board on the stdout, this is highly configurable using macros provided.
   7. read_fen
@@ -221,7 +221,7 @@ char* pretty_print_full_name(int piece) {
 }
 
 int is_in_moves_list(int rownum, int colnum) {
-  // returns count of moves in global moves list.
+  // returns 1 if move is in moves list otherwise returns zero.
   move *temp = moves;
   while(temp != NULL) {
     if(temp -> to_row == rownum && temp -> to_column == colnum)
@@ -232,7 +232,7 @@ int is_in_moves_list(int rownum, int colnum) {
 }
 
 int is_in_dangers_list(int rownum, int colnum) {
-  // returns count of moves in global dangers list.
+  // returns 1 if move is in moves list otherwise returns zero.
   move *temp = dangers;
   while(temp != NULL) {
     if(temp -> from_row == rownum && temp -> from_column == colnum)
@@ -715,42 +715,23 @@ void danger_by_row_column(int piece, int row, int column) {
   move_in_direction_of_danger(piece, row, column, NORTH_WEST);
   move_in_direction_of_danger(piece, row, column, SOUTH_WEST);
   // dangers from enemy knight
-  if(piece > 0) {             // if piece is white
-    if(board[row - 1][column - 2] == -KNIGHT)
-      push_danger(-KNIGHT, row - 1, column - 2, row, column);
-    if(board[row - 1][column + 2] == -KNIGHT)
-      push_danger(-KNIGHT, row - 1, column + 2, row, column);
-    if(board[row - 2][column - 1] == -KNIGHT)
-      push_danger(-KNIGHT, row - 2, column - 1, row, column);
-    if(board[row - 2][column + 1] == -KNIGHT)
-      push_danger(-KNIGHT, row - 2, column + 1, row, column);
-    if(board[row + 1][column - 2] == -KNIGHT)
-      push_danger(-KNIGHT, row + 1, column - 2, row, column);
-    if(board[row + 1][column + 2] == -KNIGHT)
-      push_danger(-KNIGHT, row + 1, column + 2, row, column);
-    if(board[row + 2][column - 1] == -KNIGHT)
-      push_danger(-KNIGHT, row + 2, column - 1, row, column);
-    if(board[row + 2][column + 1] == -KNIGHT)
-      push_danger(-KNIGHT, row + 2, column + 1, row, column);
-  }
-  else if(piece < 0) {        // else piece is black
-    if(board[row - 1][column - 2] == KNIGHT)
-      push_danger(KNIGHT, row - 1, column - 2, row, column);
-    if(board[row - 1][column + 2] == KNIGHT)
-      push_danger(KNIGHT, row - 1, column + 2, row, column);
-    if(board[row - 2][column - 1] == KNIGHT)
-      push_danger(KNIGHT, row - 2, column - 1, row, column);
-    if(board[row - 2][column + 1] == KNIGHT)
-      push_danger(KNIGHT, row - 2, column + 1, row, column);
-    if(board[row + 1][column - 2] == KNIGHT)
-      push_danger(KNIGHT, row + 1, column - 2, row, column);
-    if(board[row + 1][column + 2] == KNIGHT)
-      push_danger(KNIGHT, row + 1, column + 2, row, column);
-    if(board[row + 2][column - 1] == KNIGHT)
-      push_danger(KNIGHT, row + 2, column - 1, row, column);
-    if(board[row + 2][column + 1] == KNIGHT)
-      push_danger(KNIGHT, row + 2, column + 1, row, column);
-  }
+  int sign = sign_of_piece(piece);
+  if(board[row - 1][column - 2] == (-1 * sign * KNIGHT))
+    push_danger(-1 * sign * KNIGHT, row - 1, column - 2, row, column);
+  if(board[row - 1][column + 2] == (-1 * sign * KNIGHT))
+    push_danger(-1 * sign * KNIGHT, row - 1, column + 2, row, column);
+  if(board[row - 2][column - 1] == (-1 * sign * KNIGHT))
+    push_danger(-1 * sign * KNIGHT, row - 2, column - 1, row, column);
+  if(board[row - 2][column + 1] == (-1 * sign * KNIGHT))
+    push_danger(-1 * sign * KNIGHT, row - 2, column + 1, row, column);
+  if(board[row + 1][column - 2] == (-1 * sign * KNIGHT))
+    push_danger(-1 * sign * KNIGHT, row + 1, column - 2, row, column);
+  if(board[row + 1][column + 2] == (-1 * sign * KNIGHT))
+    push_danger(-1 * sign * KNIGHT, row + 1, column + 2, row, column);
+  if(board[row + 2][column - 1] == (-1 * sign * KNIGHT))
+    push_danger(-1 * sign * KNIGHT, row + 2, column - 1, row, column);
+  if(board[row + 2][column + 1] == (-1 * sign * KNIGHT))
+    push_danger(-1 * sign * KNIGHT, row + 2, column + 1, row, column);
 }
 
 void remove_unsafe_moves() {
@@ -994,7 +975,4 @@ int main() {
   show_board();
   return 1;
 }
-
-
-
 
