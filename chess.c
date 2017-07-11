@@ -35,7 +35,14 @@
 #define DANGERS_MODE	1
 #define DANGERS_HELP	1
 #define SHOW_HARM	1
+
+// macros that toogles wisdom
 #define WISE_KING	1
+#define WISE_QUEEN	0
+#define WISE_ROOK	0
+#define WISE_KNIGHT	0
+#define WISE_BISHOP	0
+#define WISE_PAWN	0
 
 int board[BOARD_SIZE][BOARD_SIZE]; /* Board representation, white as positive, black as negative, blanks with zeroes */
 
@@ -53,17 +60,17 @@ move *moves = NULL, *dangers = NULL;
 
 /*
   Note.
-  1. Maybe a verbose analyse level for pretty printing of DANGERS_MODE macro
+  1. A function to remove unsafe moves from 'moves' list
   
-   Some documentation goes here.
+  Some documentation goes here.
 
-   Note.
-   KING.   Allowed to move one step in eight directions.
-   QUEEN.  Allowed to move infinty steps in eight directions.
-   ROOK.   Allowed to move infinty steps in four straight directions.
-   BISHOP. Allowed to move infinty steps in four diagonal directions.
-   KNIGHT. Allowed to move one step in eight strange directions.
-   PAWN.   Allowed to move one step forward in three directions.
+  Note.
+  KING.   Allowed to move one step in eight directions.
+  QUEEN.  Allowed to move infinty steps in eight directions.
+  ROOK.   Allowed to move infinty steps in four straight directions.
+  BISHOP. Allowed to move infinty steps in four diagonal directions.
+  KNIGHT. Allowed to move one step in eight strange directions.
+  PAWN.   Allowed to move one step forward in three directions.
    
 */
 
@@ -282,6 +289,12 @@ void read_fen() {
   }
 }
 
+int sign_of_piece(int piece) {
+  if(piece > 0)
+    return 1;
+  return -1;
+}
+
 void clear_moves() {
   move *temp = NULL;
   while(moves != NULL) {
@@ -346,8 +359,12 @@ void show_dangers() {
 }
 
 void push_move(int piece, int from_rownum, int from_colnum, int to_rownum, int to_colnum) {
-  if (board[to_rownum][to_colnum] == INVALID) // discard invalid moves
-    return;
+  if (board[to_rownum][to_colnum] == INVALID)
+    return; // discard invalid moves
+  if (from_rownum < 2 || from_rownum > (BOARD_SIZE - 3) || from_colnum < 2 || from_colnum > (BOARD_SIZE - 3))
+    return; // discard invalid moves
+  if (to_rownum < 2 || to_rownum > (BOARD_SIZE - 3) || to_colnum < 2 || to_colnum > (BOARD_SIZE - 3))
+    return; // discard invalid moves
   move *temp = (move *)malloc(sizeof(move));
   temp -> piece = piece;
   temp -> from_row = from_rownum;
@@ -575,7 +592,7 @@ void move_in_direction_of_danger(int piece, int row, int column, int direction) 
 }
 
 void danger_by_row_column(int piece, int row, int column) {
-  // initialises linked list pointer 'dangers' with list of dangers that await for 'piece' if it is placed at (row, column)
+  // initialises linked list pointer 'dangers' with list of dangers that await for 'piece' which is at (row, column)
   clear_dangers();
   // dangers from enemy king, rooks, bishops, queens, and pawns.
   move_in_direction_of_danger(piece, row, column, NORTH);
@@ -625,6 +642,30 @@ void danger_by_row_column(int piece, int row, int column) {
   }
 }
 
+void remove_unsafe_moves() {
+  /* this function removes moves from the 'moves' list that are unsafe for the pieces in that list */
+  move *temp = moves, *safe_moves = NULL;
+  while(temp != NULL) {
+    board[(temp -> from_row)][(temp -> from_column)] = BLANK;
+    danger_by_row_column(temp -> piece, temp-> to_row, temp -> to_column);
+    if(dangers == NULL) {
+      // move is safe from enemy pieces, push it to 'safe_moves' list
+      move *safe_temp = (move *)malloc(sizeof(move));
+      safe_temp -> piece       =	temp -> piece;
+      safe_temp -> from_row    =	temp -> from_row;
+      safe_temp -> from_column =	temp -> from_column;
+      safe_temp -> to_row      =	temp -> to_row;
+      safe_temp -> to_column   =	temp -> to_column;
+      safe_temp -> next	       =	safe_moves;
+      safe_moves	       =	safe_temp;
+    }
+    board[temp -> from_row][temp -> from_column] = temp -> piece;
+    temp = temp -> next;
+  }
+  clear_moves();
+  moves = safe_moves;
+}
+
 void moves_of_pawn(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the pawn at (row,column) can make.
   clear_moves();
@@ -648,59 +689,48 @@ void moves_of_pawn(int row, int column) {
     if(board[row + 1][column + 1] > 0 && board[row + 1][column + 1] != BLANK)
       push_move(-PAWN, row, column, row + 1, column + 1);
   }
+  if(WISE_PAWN)
+    remove_unsafe_moves();
 }
 
 void moves_of_bishop(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the bishop at (row,column) can make.
   clear_moves();
   move_diagonally(row, column);
+  if(WISE_BISHOP)
+    remove_unsafe_moves();
 }
 
 void moves_of_knight(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the knight at (row,column) can make.
   clear_moves();
-  if(board[row][column] > 0) {	                        // if piece is white
-    if(board[row - 1][column - 2] == BLANK || board[row - 1][column - 2] < 0)
-      push_move(KNIGHT, row, column, row - 1, column - 2);
-    if(board[row - 1][column + 2] == BLANK || board[row - 1][column + 2] < 0)
-      push_move(KNIGHT, row, column, row - 1, column + 2);
-    if(board[row - 2][column - 1] == BLANK || board[row - 2][column - 1] < 0)
-      push_move(KNIGHT, row, column, row - 2, column - 1);
-    if(board[row - 2][column + 1] == BLANK || board[row - 2][column + 1] < 0)
-      push_move(KNIGHT, row, column, row - 2, column + 1);
-    if(board[row + 1][column - 2] == BLANK || board[row + 1][column - 2] < 0)
-      push_move(KNIGHT, row, column, row + 1, column - 2);
-    if(board[row + 1][column + 2] == BLANK || board[row + 1][column + 2] < 0)
-      push_move(KNIGHT, row, column, row + 1, column + 2);
-    if(board[row + 2][column - 1] == BLANK || board[row + 2][column - 1] < 0)
-      push_move(KNIGHT, row, column, row + 2, column - 1);
-    if(board[row + 2][column + 1] == BLANK || board[row + 2][column + 1] < 0)
-      push_move(KNIGHT, row, column, row + 2, column + 1);
-  }
-  else if(board[row][column] < 0) {			// else piece is black
-    if(board[row - 1][column - 2] == BLANK || board[row - 1][column - 2] > 0)
-      push_move(-KNIGHT, row, column, row - 1, column - 2);
-    if(board[row - 1][column + 2] == BLANK || board[row - 1][column + 2] > 0)
-      push_move(-KNIGHT, row, column, row - 1, column + 2);
-    if(board[row - 2][column - 1] == BLANK || board[row - 2][column - 1] > 0)
-      push_move(-KNIGHT, row, column, row - 2, column - 1);
-    if(board[row - 2][column + 1] == BLANK || board[row - 2][column + 1] > 0)
-      push_move(-KNIGHT, row, column, row - 2, column + 1);
-    if(board[row + 1][column - 2] == BLANK || board[row + 1][column - 2] > 0)
-      push_move(-KNIGHT, row, column, row + 1, column - 2);
-    if(board[row + 1][column + 2] == BLANK || board[row + 1][column + 2] > 0)
-      push_move(-KNIGHT, row, column, row + 1, column + 2);
-    if(board[row + 2][column - 1] == BLANK || board[row + 2][column - 1] > 0)
-      push_move(-KNIGHT, row, column, row + 2, column - 1);
-    if(board[row + 2][column + 1] == BLANK || board[row + 2][column + 1] > 0)
-      push_move(-KNIGHT, row, column, row + 2, column + 1);
-  }
+  int sign_of_knight = sign_of_piece(board[row][column]);
+  if(board[row - 1][column - 2] == BLANK || sign_of_piece(board[row - 1][column - 2]) != sign_of_knight)
+    push_move(sign_of_knight * KNIGHT, row, column, row - 1, column - 2);
+  if(board[row - 1][column + 2] == BLANK || sign_of_piece(board[row - 1][column + 2]) != sign_of_knight)
+    push_move(sign_of_knight * KNIGHT, row, column, row - 1, column + 2);
+  if(board[row - 2][column - 1] == BLANK || sign_of_piece(board[row - 2][column - 1]) != sign_of_knight)
+    push_move(sign_of_knight * KNIGHT, row, column, row - 2, column - 1);
+  if(board[row - 2][column + 1] == BLANK || sign_of_piece(board[row - 2][column + 1]) != sign_of_knight)
+    push_move(sign_of_knight * KNIGHT, row, column, row - 2, column + 1);
+  if(board[row + 1][column - 2] == BLANK || sign_of_piece(board[row + 1][column - 2]) != sign_of_knight)
+    push_move(sign_of_knight * KNIGHT, row, column, row + 1, column - 2);
+  if(board[row + 1][column + 2] == BLANK || sign_of_piece(board[row + 1][column + 2]) != sign_of_knight)
+    push_move(sign_of_knight * KNIGHT, row, column, row + 1, column + 2);
+  if(board[row + 2][column - 1] == BLANK || sign_of_piece(board[row + 2][column - 1]) != sign_of_knight)
+    push_move(sign_of_knight * KNIGHT, row, column, row + 2, column - 1);
+  if(board[row + 2][column + 1] == BLANK || sign_of_piece(board[row + 2][column + 1]) != sign_of_knight)
+    push_move(sign_of_knight * KNIGHT, row, column, row + 2, column + 1);
+  if(WISE_KNIGHT)
+    remove_unsafe_moves();
 }
 
 void moves_of_rook(int row, int column) {
   // initialises linked list pointer 'moves' with list of moves that the rook at (row,column) can make.
   clear_moves();
   move_straight(row, column);
+  if(WISE_ROOK)
+    remove_unsafe_moves();
 }
 
 void moves_of_queen(int row, int column) {
@@ -708,163 +738,32 @@ void moves_of_queen(int row, int column) {
   clear_moves();
   move_diagonally(row, column);
   move_straight(row, column);  
+  if(WISE_QUEEN)
+    remove_unsafe_moves();
 }
 
 void moves_of_king(int row, int column) {
-  /* write a not_in_danger function which detects if a piece will be in danger if it is put at (row,column) */
   // initialises linked list pointer 'moves' with list of moves that the king at (row,column) can make.
-  int piece = board[row][column];
-  board[row][column] = BLANK;	/* Move the piece off the board first, before calculating dangers for places to which the piece can move*/
   clear_moves();
-  if(piece > 0) {	// if piece is white
-    if(board[row - 1][column] == BLANK || board[row - 1][column] < 0) {
-      if(WISE_KING) {
-	danger_by_row_column(KING, row - 1, column);
-	if(dangers == NULL)
-	  push_move(KING, row, column, row - 1, column);
-      }
-      else
-	push_move(KING, row, column, row - 1, column);
-    }
-    if(board[row - 1][column - 1] == BLANK || board[row - 1][column - 1] < 0) {
-      if(WISE_KING) {
-	danger_by_row_column(KING, row - 1, column - 1);
-	if(dangers == NULL)
-	  push_move(KING, row, column, row - 1, column - 1);
-      }
-      else
-	push_move(KING, row, column, row - 1, column - 1);
-    }
-    if(board[row - 1][column + 1] == BLANK || board[row - 1][column + 1] < 0) {
-      if(WISE_KING) {
-	danger_by_row_column(KING, row - 1, column + 1);
-	if(dangers == NULL)
-	  push_move(KING, row, column, row - 1, column + 1);
-      }
-      else
-	push_move(KING, row, column, row - 1, column + 1);
-    }
-    if(board[row][column - 1] == BLANK || board[row][column - 1] < 0) {
-      if(WISE_KING) {
-	danger_by_row_column(KING, row, column - 1);
-	if(dangers == NULL)
-	  push_move(KING, row, column, row, column - 1);
-      }
-      else
-	push_move(KING, row, column, row, column - 1);
-    }
-    if(board[row][column + 1] == BLANK || board[row][column + 1] < 0) {
-      if(WISE_KING) {
-	danger_by_row_column(KING, row, column + 1);
-	if(dangers == NULL)
-	  push_move(KING, row, column, row, column + 1);
-    }
-    else
-      push_move(KING, row, column, row, column + 1);
-    }
-    if(board[row + 1][column] == BLANK || board[row + 1][column] < 0) {
-      if(WISE_KING) {
-	danger_by_row_column(KING, row + 1, column);
-	if(dangers == NULL)
-	  push_move(KING, row, column, row + 1, column);
-    }
-    else
-      push_move(KING, row, column, row + 1, column);
-    }
-    if(board[row + 1][column - 1] == BLANK || board[row + 1][column - 1] < 0) {
-      if(WISE_KING) {
-	danger_by_row_column(KING, row + 1, column - 1);
-	if(dangers == NULL)
-	  push_move(KING, row, column, row + 1, column - 1);
-    }
-    else
-      push_move(KING, row, column, row + 1, column - 1);
-    }
-    if(board[row + 1][column + 1] == BLANK || board[row + 1][column + 1] < 0) {
-      if(WISE_KING) {
-	danger_by_row_column(KING, row + 1, column + 1);
-	if(dangers == NULL)
-	  push_move(KING, row, column, row + 1, column + 1);
-    }
-    else
-      push_move(KING, row, column, row + 1, column + 1);
-    }
-  }
-  else if(piece < 0)  {	// else piece is black
-    if(board[row - 1][column] == BLANK || board[row - 1][column] > 0) {
-      if(WISE_KING) {
-	danger_by_row_column(-KING, row - 1, column);
-	if(dangers == NULL)
-	  push_move(-KING, row, column, row - 1, column);
-      }
-      else
-	push_move(-KING, row, column, row - 1, column);
-    }
-    if(board[row - 1][column - 1] == BLANK || board[row - 1][column - 1] > 0) {
-      if(WISE_KING) {
-	danger_by_row_column(-KING, row - 1, column - 1);
-	if(dangers == NULL)
-	  push_move(-KING, row, column, row - 1, column - 1);
-      }
-      else
-	push_move(-KING, row, column, row - 1, column - 1);
-    }
-    if(board[row - 1][column + 1] == BLANK || board[row - 1][column + 1] > 0) {
-      if(WISE_KING) {
-	danger_by_row_column(-KING, row - 1, column + 1);
-	if(dangers == NULL)
-	  push_move(-KING, row, column, row - 1, column + 1);
-      }
-      else
-	push_move(-KING, row, column, row - 1, column + 1);
-    }
-    if(board[row][column - 1] == BLANK || board[row][column - 1] > 0) {
-      if(WISE_KING) {
-	danger_by_row_column(-KING, row, column - 1);
-	if(dangers == NULL)
-	  push_move(-KING, row, column, row, column - 1);
-      }
-      else
-	push_move(-KING, row, column, row, column - 1);
-    }
-    if(board[row][column + 1] == BLANK || board[row][column + 1] > 0) {
-      if(WISE_KING) {
-	danger_by_row_column(-KING, row, column + 1);
-	if(dangers == NULL)
-	  push_move(-KING, row, column, row, column + 1);
-    }
-    else
-      push_move(-KING, row, column, row, column + 1);
-    }
-    if(board[row + 1][column] == BLANK || board[row + 1][column] > 0) {
-      if(WISE_KING) {
-	danger_by_row_column(-KING, row + 1, column);
-	if(dangers == NULL)
-	  push_move(-KING, row, column, row + 1, column);
-    }
-    else
-      push_move(-KING, row, column, row + 1, column);
-    }
-    if(board[row + 1][column - 1] == BLANK || board[row + 1][column - 1] > 0) {
-      if(WISE_KING) {
-	danger_by_row_column(-KING, row + 1, column - 1);
-	if(dangers == NULL)
-	  push_move(-KING, row, column, row + 1, column - 1);
-    }
-    else
-      push_move(-KING, row, column, row + 1, column - 1);
-    }
-    if(board[row + 1][column + 1] == BLANK || board[row + 1][column + 1] > 0) {
-      if(WISE_KING) {
-	danger_by_row_column(-KING, row + 1, column + 1);
-	if(dangers == NULL)
-	  push_move(-KING, row, column, row + 1, column + 1);
-    }
-    else
-      push_move(-KING, row, column, row + 1, column + 1);
-    }
-  }
-  board[row][column] = piece; /* Place the piece back onto the board */
+  int sign_of_king = sign_of_piece(board[row][column]);
+  if(board[row - 1][column] == BLANK || sign_of_piece(board[row - 1][column]) != sign_of_king)
+    push_move(sign_of_king * KING, row, column, row - 1, column);
+  if(board[row - 1][column - 1] == sign_of_piece(BLANK || board[row - 1][column - 1]) != sign_of_king)
+    push_move(sign_of_king * KING, row, column, row - 1, column - 1);
+  if(board[row - 1][column + 1] == sign_of_piece(BLANK || board[row - 1][column + 1]) != sign_of_king)
+    push_move(sign_of_king * KING, row, column, row - 1, column + 1);
+  if(board[row][column - 1] == BLANK || sign_of_piece(board[row][column - 1]) != sign_of_king)
+    push_move(sign_of_king * KING, row, column, row, column - 1);
+  if(board[row][column + 1] == BLANK || sign_of_piece(board[row][column + 1]) != sign_of_king)
+    push_move(sign_of_king * KING, row, column, row, column + 1);
+  if(board[row + 1][column] == BLANK || sign_of_piece(board[row + 1][column]) != sign_of_king)
+    push_move(sign_of_king * KING, row, column, row + 1, column);
+  if(board[row + 1][column - 1] == sign_of_piece(BLANK || board[row + 1][column - 1]) != sign_of_king)
+    push_move(sign_of_king * KING, row, column, row + 1, column - 1);
+  if(board[row + 1][column + 1] == sign_of_piece(BLANK || board[row + 1][column + 1]) != sign_of_king)
+    push_move(sign_of_king * KING, row, column, row + 1, column + 1);
+  if(WISE_KING)			/* this must be on for normal gameplay */
+    remove_unsafe_moves();
 }
 
 void move_by_row_column (int row, int column) {
@@ -966,11 +865,12 @@ int main() {
   freopen("input.txt", "r", stdin);
   initialise_board();
   read_fen();
-  
-  move_by_notation("e5");
+
+  char str[] = "e5";
+  move_by_notation(str);
   show_moves();
 
-  danger_on_oneself_by_notation("e5");
+  danger_on_oneself_by_notation(str);
   show_dangers();
   
   show_board();
