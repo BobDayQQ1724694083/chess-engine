@@ -1,75 +1,82 @@
 
-chess.c,1764
-#define KING	7,119
-#define QUEEN	8,135
-#define ROOK	9,151
-#define KNIGHT	10,166
-#define BISHOP	11,183
-#define PAWN	12,200
-#define NORTH	15,241
-#define NORTH_EAST	16,258
-#define EAST	17,279
-#define SOUTH_EAST	18,295
-#define SOUTH	19,316
-#define SOUTH_WEST	20,333
-#define WEST	21,354
-#define NORTH_WEST	22,370
-#define INVALID	25,426
-#define BOARD_SIZE	26,446
-#define BLANK	27,468
-#define SHOW_VALUES	30,516
-#define SHOW_FEN	31,538
-#define SHOW_KILL	32,557
-#define SHOW_MOVES	33,577
-#define SHOW_DANGERS	34,598
-int board[board36,622
-typedef struct node 38,743
-  int piece;40,846
-  int from_row;41,859
-  int from_column;42,875
-  int to_row;43,894
-  int to_column;44,908
-  struct node *next;next45,925
-}move;move46,946
-move *moves moves48,954
-void initialise_board(68,1625
-char pretty_print(79,1949
-int is_in_moves_list(98,2395
-int is_in_dangers_list(108,2612
-void show_board(118,2837
-void read_fen(189,4549
-void clear_moves(243,5762
-void clear_dangers(252,5897
-void translate_move(261,6042
-void translate_danger(268,6365
-void show_moves(275,6707
-void show_dangers(285,6958
-void push_move(296,7218
-void push_danger(309,7640
-void change_row_column(322,8070
-void move_in_direction(343,8520
-void move_diagonally(368,9540
-void move_straight(376,9837
-void move_in_direction_of_danger(384,10108
-void danger_by_row_column(525,14251
-void moves_of_pawn(576,16852
-void moves_of_bishop(601,18141
-void moves_of_knight(607,18343
-void moves_of_rook(648,20858
-void moves_of_queen(654,21054
-void moves_of_king(661,21286
-void move_by_row_column 703,23756
-void move_by_notation(732,24277
-void danger_by_notation(776,24937
-void danger_on_oneself(820,25619
-void danger_on_oneself_by_notation(824,25725
-int main(868,26397
+chess.c,1935
+#define KING	8,139
+#define QUEEN	9,155
+#define ROOK	10,171
+#define KNIGHT	11,186
+#define BISHOP	12,203
+#define PAWN	13,220
+#define NORTH	16,261
+#define NORTH_EAST	17,278
+#define EAST	18,299
+#define SOUTH_EAST	19,315
+#define SOUTH	20,336
+#define SOUTH_WEST	21,353
+#define WEST	22,374
+#define NORTH_WEST	23,390
+#define INVALID	26,446
+#define BOARD_SIZE	27,466
+#define BLANK	28,488
+#define SHOW_VALUES	31,536
+#define SHOW_FEN	32,558
+#define SHOW_KILL	33,577
+#define MOVES_MODE	34,597
+#define DANGERS_MODE	35,618
+#define DANGERS_HELP	36,641
+#define SHOW_HARM	37,664
+#define WISE_KING	38,684
+int board[board40,705
+typedef struct node 42,826
+  int piece;44,929
+  int from_row;45,942
+  int from_column;46,958
+  int to_row;47,977
+  int to_column;48,991
+  struct node *next;next49,1008
+}move;move50,1029
+move *moves moves52,1037
+void initialise_board(70,1606
+char pretty_print(81,1930
+char* pretty_print_full_name(100,2376
+int is_in_moves_list(119,2961
+int is_in_dangers_list(129,3178
+void show_board(139,3403
+void read_fen(231,5717
+void clear_moves(285,6930
+void clear_dangers(294,7065
+void translate_move(303,7210
+void translate_danger(310,7578
+void show_moves(317,7985
+void show_dangers(327,8236
+void push_move(348,8895
+void push_danger(361,9317
+void change_row_column(374,9747
+void move_in_direction(395,10197
+void move_diagonally(420,11217
+void move_straight(428,11514
+void move_in_direction_of_danger(436,11785
+void danger_by_row_column(577,15928
+void moves_of_pawn(628,18529
+void moves_of_bishop(653,19818
+void moves_of_knight(659,20020
+void moves_of_rook(700,22535
+void moves_of_queen(706,22731
+void moves_of_king(713,22963
+void move_by_row_column 870,28313
+void set_row_column_by_notation(899,28834
+void move_by_notation(940,29444
+void danger_by_notation(947,29626
+void danger_on_oneself(954,29830
+void danger_on_oneself_by_notation(958,29936
+int main(965,30130
 
 LICENSE.md,16
 Copyright 3,13
 
 README.md,46
 This is a relatively simple chess engine,1,0
+
+makefile~,0
 
 input.txt,0
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
+#include <stdlib.h>
 
 // macros for pieces
 #define KING	10
@@ -30,8 +31,11 @@
 #define SHOW_VALUES	0
 #define SHOW_FEN	1
 #define SHOW_KILL	1
-#define SHOW_MOVES	1
-#define SHOW_DANGERS	1
+#define MOVES_MODE	1
+#define DANGERS_MODE	1
+#define DANGERS_HELP	1
+#define SHOW_HARM	1
+#define WISE_KING	1
 
 int board[BOARD_SIZE][BOARD_SIZE]; /* Board representation, white as positive, black as negative, blanks with zeroes */
 
@@ -49,9 +53,7 @@ move *moves = NULL, *dangers = NULL;
 
 /*
   Note.
-  1. Add danger awareness to moves_of_king() 
-  2. Apply some pretty printing with SHOW_DANGERS macro
-  3. Maybe a verbose analyse level for pretty printing of SHOW_DANGERS macro
+  1. Maybe a verbose analyse level for pretty printing of DANGERS_MODE macro
   
    Some documentation goes here.
 
@@ -92,6 +94,25 @@ char pretty_print(int piece) {
   case -ROOK:		return 'r';
   case -QUEEN:       	return 'q';
   case -KING:		return 'k';
+  }
+}
+
+char* pretty_print_full_name(int piece) {
+  switch(piece) {
+  case INVALID:		return "Invalid";
+  case BLANK:		return "Blank";
+  case PAWN:		return "White Pawn";
+  case BISHOP:		return "White Bishop";
+  case KNIGHT:		return "White Knight";
+  case ROOK:		return "White Rook";
+  case QUEEN:		return "White Queen";
+  case KING:		return "White King";
+  case -PAWN:		return "Black Pawn";
+  case -BISHOP:		return "Black Bishop";
+  case -KNIGHT:		return "Black Knight";
+  case -ROOK:		return "Black Rook";
+  case -QUEEN:       	return "Black Queen";
+  case -KING:		return "Black King";
   }
 }
 
@@ -155,7 +176,6 @@ void show_board() {
     printf("\n   ");
     for(int i = 2; i < (BOARD_SIZE - 2); i++)
       printf("%c  ", (i+95));
-    
     if(SHOW_KILL && moves != NULL) {
       printf("\n  ");
       for(int i = 2; i < 14; i++)
@@ -183,12 +203,34 @@ void show_board() {
       for(int i = 2; i < (BOARD_SIZE - 2); i++)
 	printf("%c  ", (i+95));
     }
+    if(SHOW_HARM && dangers != NULL) {
+      printf("\n  ");
+      for(int i = 2; i < 14; i++)
+	printf("--");
+      printf("\n");
+      for(int i = 2; i < (BOARD_SIZE - 2); i++) {
+	printf("%d |", (BOARD_SIZE - 2) - i);
+	for(int j = 2; j < (BOARD_SIZE - 2); j++) {
+	  if(is_in_dangers_list(i, j))
+	    printf("=| ");
+	  else
+	    printf("%c| ",pretty_print(board[i][j]));
+	}
+	printf("%d\n", (BOARD_SIZE - 2) - i);
+      }
+      printf("  ");
+      for(int i = 2; i < (BOARD_SIZE - 2); i++)
+	printf("---");
+      printf("\n   ");
+      for(int i = 2; i < (BOARD_SIZE - 2); i++)
+	printf("%c  ", (i+95));
+    }
   }
 }
 
 void read_fen() {
-  char str[64];
-  fgets(str, 64, stdin);
+  char str[75];
+  fgets(str, 75, stdin);
   if(SHOW_FEN) {
     fprintf(stdout, "FEN: %s", str);
   }
@@ -259,17 +301,17 @@ void clear_dangers() {
 }
 
 void translate_move(int piece, int from_row, int from_column, int to_row, int to_column) {
-  if(SHOW_MOVES)
+  if(MOVES_MODE)		/* macro toggles way of displaying moves */
     printf("%c%c%d-%c%c%d ", pretty_print(piece), from_column + 95, (BOARD_SIZE - 2) - from_row, pretty_print(piece), to_column + 95, (BOARD_SIZE - 2) - to_row);
   else
     printf("r%d-c%d ", to_row, to_column);
 }
 
 void translate_danger(int piece, int from_row, int from_column, int to_row, int to_column) {
-  if(SHOW_DANGERS)
-    printf("%c%c%d ->> %c%d ", pretty_print(piece), from_column + 95, (BOARD_SIZE - 2) - from_row, to_column + 95, (BOARD_SIZE - 2) - to_row);
+  if(DANGERS_MODE)		/* macro toggles way of displaying dangers */
+    printf("%c%c%d-%c%c%d ", pretty_print(piece), from_column + 95, (BOARD_SIZE - 2) - from_row, pretty_print(piece), to_column + 95, (BOARD_SIZE - 2) - to_row);
   else
-    printf("r%d-c%d ->> r%dc%d ", from_row, from_column, to_row, to_column);
+    printf("r%d-c%d -> r%dc%d ", from_row, from_column, to_row, to_column);
 }
 
 void show_moves() {
@@ -290,8 +332,18 @@ void show_dangers() {
     translate_danger(temp -> piece, temp -> from_row, temp -> from_column, temp -> to_row, temp -> to_column);
     temp = temp -> next;
   }
+  if(DANGERS_HELP) {
+    int count = 1;
+    move *temp = dangers;
+    if(temp != NULL)
+      while(temp != NULL) {
+	printf("\n%d. %s at %c%d is attacking %c%d", count, pretty_print_full_name(temp -> piece), (temp -> from_column) + 95, (BOARD_SIZE - 2) - (temp -> from_row), (temp -> to_column) + 95, (BOARD_SIZE - 2) - (temp -> to_row));
+	temp = temp -> next;
+	count++;
+      }
+    printf("\n");
+  }
 }
-
 
 void push_move(int piece, int from_rownum, int from_colnum, int to_rownum, int to_colnum) {
   if (board[to_rownum][to_colnum] == INVALID) // discard invalid moves
@@ -661,43 +713,158 @@ void moves_of_queen(int row, int column) {
 void moves_of_king(int row, int column) {
   /* write a not_in_danger function which detects if a piece will be in danger if it is put at (row,column) */
   // initialises linked list pointer 'moves' with list of moves that the king at (row,column) can make.
+  int piece = board[row][column];
+  board[row][column] = BLANK;	/* Move the piece off the board first, before calculating dangers for places to which the piece can move*/
   clear_moves();
-  if(board[row][column] > 0) {	// if piece is white
-    if(board[row - 1][column] == BLANK || board[row - 1][column] < 0)
-      push_move(KING, row, column, row - 1, column);
-    if(board[row - 1][column - 1] == BLANK || board[row - 1][column - 1] < 0)
-      push_move(KING, row, column, row - 1, column - 1);
-    if(board[row - 1][column + 1] == BLANK || board[row - 1][column + 1] < 0)
-      push_move(KING, row, column, row - 1, column + 1);
-    if(board[row][column - 1] == BLANK || board[row][column - 1] < 0)
-      push_move(KING, row, column, row, column - 1);
-    if(board[row][column + 1] == BLANK || board[row][column + 1] < 0)
+  if(piece > 0) {	// if piece is white
+    if(board[row - 1][column] == BLANK || board[row - 1][column] < 0) {
+      if(WISE_KING) {
+	danger_by_row_column(KING, row - 1, column);
+	if(dangers == NULL)
+	  push_move(KING, row, column, row - 1, column);
+      }
+      else
+	push_move(KING, row, column, row - 1, column);
+    }
+    if(board[row - 1][column - 1] == BLANK || board[row - 1][column - 1] < 0) {
+      if(WISE_KING) {
+	danger_by_row_column(KING, row - 1, column - 1);
+	if(dangers == NULL)
+	  push_move(KING, row, column, row - 1, column - 1);
+      }
+      else
+	push_move(KING, row, column, row - 1, column - 1);
+    }
+    if(board[row - 1][column + 1] == BLANK || board[row - 1][column + 1] < 0) {
+      if(WISE_KING) {
+	danger_by_row_column(KING, row - 1, column + 1);
+	if(dangers == NULL)
+	  push_move(KING, row, column, row - 1, column + 1);
+      }
+      else
+	push_move(KING, row, column, row - 1, column + 1);
+    }
+    if(board[row][column - 1] == BLANK || board[row][column - 1] < 0) {
+      if(WISE_KING) {
+	danger_by_row_column(KING, row, column - 1);
+	if(dangers == NULL)
+	  push_move(KING, row, column, row, column - 1);
+      }
+      else
+	push_move(KING, row, column, row, column - 1);
+    }
+    if(board[row][column + 1] == BLANK || board[row][column + 1] < 0) {
+      if(WISE_KING) {
+	danger_by_row_column(KING, row, column + 1);
+	if(dangers == NULL)
+	  push_move(KING, row, column, row, column + 1);
+    }
+    else
       push_move(KING, row, column, row, column + 1);
-    if(board[row + 1][column] == BLANK || board[row + 1][column] < 0)
+    }
+    if(board[row + 1][column] == BLANK || board[row + 1][column] < 0) {
+      if(WISE_KING) {
+	danger_by_row_column(KING, row + 1, column);
+	if(dangers == NULL)
+	  push_move(KING, row, column, row + 1, column);
+    }
+    else
       push_move(KING, row, column, row + 1, column);
-    if(board[row + 1][column - 1] == BLANK || board[row + 1][column - 1] < 0)
+    }
+    if(board[row + 1][column - 1] == BLANK || board[row + 1][column - 1] < 0) {
+      if(WISE_KING) {
+	danger_by_row_column(KING, row + 1, column - 1);
+	if(dangers == NULL)
+	  push_move(KING, row, column, row + 1, column - 1);
+    }
+    else
       push_move(KING, row, column, row + 1, column - 1);
-    if(board[row + 1][column + 1] == BLANK || board[row + 1][column + 1] < 0)
+    }
+    if(board[row + 1][column + 1] == BLANK || board[row + 1][column + 1] < 0) {
+      if(WISE_KING) {
+	danger_by_row_column(KING, row + 1, column + 1);
+	if(dangers == NULL)
+	  push_move(KING, row, column, row + 1, column + 1);
+    }
+    else
       push_move(KING, row, column, row + 1, column + 1);
+    }
   }
-  else if(board[row][column] < 0) {			// else piece is black
-    if(board[row - 1][column] == BLANK || board[row - 1][column] > 0)
-      push_move(-KING, row, column, row - 1, column);
-    if(board[row - 1][column - 1] == BLANK || board[row - 1][column - 1] > 0)
-      push_move(-KING, row, column, row - 1, column - 1);
-    if(board[row - 1][column + 1] == BLANK || board[row - 1][column + 1] > 0)
-      push_move(-KING, row, column, row - 1, column + 1);
-    if(board[row][column - 1] == BLANK || board[row][column - 1] > 0)
-      push_move(-KING, row, column, row, column - 1);
-    if(board[row][column + 1] == BLANK || board[row][column + 1] > 0)
+  else if(piece < 0)  {	// else piece is black
+    if(board[row - 1][column] == BLANK || board[row - 1][column] > 0) {
+      if(WISE_KING) {
+	danger_by_row_column(-KING, row - 1, column);
+	if(dangers == NULL)
+	  push_move(-KING, row, column, row - 1, column);
+      }
+      else
+	push_move(-KING, row, column, row - 1, column);
+    }
+    if(board[row - 1][column - 1] == BLANK || board[row - 1][column - 1] > 0) {
+      if(WISE_KING) {
+	danger_by_row_column(-KING, row - 1, column - 1);
+	if(dangers == NULL)
+	  push_move(-KING, row, column, row - 1, column - 1);
+      }
+      else
+	push_move(-KING, row, column, row - 1, column - 1);
+    }
+    if(board[row - 1][column + 1] == BLANK || board[row - 1][column + 1] > 0) {
+      if(WISE_KING) {
+	danger_by_row_column(-KING, row - 1, column + 1);
+	if(dangers == NULL)
+	  push_move(-KING, row, column, row - 1, column + 1);
+      }
+      else
+	push_move(-KING, row, column, row - 1, column + 1);
+    }
+    if(board[row][column - 1] == BLANK || board[row][column - 1] > 0) {
+      if(WISE_KING) {
+	danger_by_row_column(-KING, row, column - 1);
+	if(dangers == NULL)
+	  push_move(-KING, row, column, row, column - 1);
+      }
+      else
+	push_move(-KING, row, column, row, column - 1);
+    }
+    if(board[row][column + 1] == BLANK || board[row][column + 1] > 0) {
+      if(WISE_KING) {
+	danger_by_row_column(-KING, row, column + 1);
+	if(dangers == NULL)
+	  push_move(-KING, row, column, row, column + 1);
+    }
+    else
       push_move(-KING, row, column, row, column + 1);
-    if(board[row + 1][column] == BLANK || board[row + 1][column] > 0)
+    }
+    if(board[row + 1][column] == BLANK || board[row + 1][column] > 0) {
+      if(WISE_KING) {
+	danger_by_row_column(-KING, row + 1, column);
+	if(dangers == NULL)
+	  push_move(-KING, row, column, row + 1, column);
+    }
+    else
       push_move(-KING, row, column, row + 1, column);
-    if(board[row + 1][column - 1] == BLANK || board[row + 1][column - 1] > 0)
+    }
+    if(board[row + 1][column - 1] == BLANK || board[row + 1][column - 1] > 0) {
+      if(WISE_KING) {
+	danger_by_row_column(-KING, row + 1, column - 1);
+	if(dangers == NULL)
+	  push_move(-KING, row, column, row + 1, column - 1);
+    }
+    else
       push_move(-KING, row, column, row + 1, column - 1);
-    if(board[row + 1][column + 1] == BLANK || board[row + 1][column + 1] > 0)
+    }
+    if(board[row + 1][column + 1] == BLANK || board[row + 1][column + 1] > 0) {
+      if(WISE_KING) {
+	danger_by_row_column(-KING, row + 1, column + 1);
+	if(dangers == NULL)
+	  push_move(-KING, row, column, row + 1, column + 1);
+    }
+    else
       push_move(-KING, row, column, row + 1, column + 1);
+    }
   }
+  board[row][column] = piece; /* Place the piece back onto the board */
 }
 
 void move_by_row_column (int row, int column) {
@@ -729,90 +896,57 @@ void move_by_row_column (int row, int column) {
   }
 }
 
-void move_by_notation(char *str) {
-  int row = 0, column = 0;
+void set_row_column_by_notation(char *str, int *row, int *column) {
   switch(str[0]) {
   case 'a':
   case 'A':
-    column = 2;
+    *column = 2;
     break;
   case 'b':
   case 'B':
-    column = 3;
+    *column = 3;
     break;
   case 'c':
   case 'C':
-    column = 4;
+    *column = 4;
     break;
   case 'd':
   case 'D':
-    column = 5;
+    *column = 5;
     break;
   case 'e':
   case 'E':
-    column = 6;
+    *column = 6;
     break;
   case 'f':
   case 'F':
-    column = 7;
+    *column = 7;
     break;
   case 'g':
   case 'G':
-    column = 8;
+    *column = 8;
     break;
   case 'h':
   case 'H':
-    column = 9;
+    *column = 9;
     break;
   }
   if(str[1] > 48 && str[1] < 57) {
-    row = str[1] - '0';
-    row = (BOARD_SIZE - 2) - row;
+    *row = str[1] - '0';
+    *row = (BOARD_SIZE - 2) - *row;
   }
+}
+
+void move_by_notation(char *str) {
+  int row = 0, column = 0;
+  set_row_column_by_notation(str, &row, &column);
   if(row != 0 && column != 0)
     move_by_row_column(row, column);
 }
 
 void danger_by_notation(int piece, char *str) {
   int row = 0, column = 0;
-  switch(str[0]) {
-  case 'a':
-  case 'A':
-    column = 2;
-    break;
-  case 'b':
-  case 'B':
-    column = 3;
-    break;
-  case 'c':
-  case 'C':
-    column = 4;
-    break;
-  case 'd':
-  case 'D':
-    column = 5;
-    break;
-  case 'e':
-  case 'E':
-    column = 6;
-    break;
-  case 'f':
-  case 'F':
-    column = 7;
-    break;
-  case 'g':
-  case 'G':
-    column = 8;
-    break;
-  case 'h':
-  case 'H':
-    column = 9;
-    break;
-  }
-  if(str[1] > 48 && str[1] < 57) {
-    row = str[1] - '0';
-    row = (BOARD_SIZE - 2) - row;
-  }
+  set_row_column_by_notation(str, &row, &column);
   if(row != 0 && column != 0)
     danger_by_row_column(piece, row, column);
 }
@@ -823,44 +957,7 @@ void danger_on_oneself(int row, int column) {
 
 void danger_on_oneself_by_notation(char *str) {
   int row = 0, column = 0;
-  switch(str[0]) {
-  case 'a':
-  case 'A':
-    column = 2;
-    break;
-  case 'b':
-  case 'B':
-    column = 3;
-    break;
-  case 'c':
-  case 'C':
-    column = 4;
-    break;
-  case 'd':
-  case 'D':
-    column = 5;
-    break;
-  case 'e':
-  case 'E':
-    column = 6;
-    break;
-  case 'f':
-  case 'F':
-    column = 7;
-    break;
-  case 'g':
-  case 'G':
-    column = 8;
-    break;
-  case 'h':
-  case 'H':
-    column = 9;
-    break;
-  }
-  if(str[1] > 48 && str[1] < 57) {
-    row = str[1] - '0';
-    row = (BOARD_SIZE - 2) - row;
-  }
+  set_row_column_by_notation(str, &row, &column);
   if(row != 0 && column != 0)
     danger_on_oneself(row, column);
 }
@@ -870,9 +967,12 @@ int main() {
   initialise_board();
   read_fen();
   
-  move_by_notation("c3");
-
+  move_by_notation("e5");
   show_moves();
+
+  danger_on_oneself_by_notation("e5");
+  show_dangers();
+  
   show_board();
   return 1;
 }
