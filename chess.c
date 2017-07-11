@@ -29,25 +29,25 @@
 
 // macros that can be toggled
 #define SHOW_VALUES	0
-#define SHOW_FEN	1
-#define SHOW_KILL	1
-#define MOVES_MODE	1
-#define DANGERS_MODE	1
-#define DANGERS_HELP	1
-#define SHOW_HARM	1
+#define SHOW_FEN        1
+#define SHOW_KILL       1
+#define MOVES_MODE      1
+#define DANGERS_MODE    1
+#define DANGERS_HELP    1
+#define SHOW_HARM       1
 
-// macros that toogles wisdom
-#define WISE_KING	1
-#define WISE_QUEEN	0
-#define WISE_ROOK	0
-#define WISE_KNIGHT	0
-#define WISE_BISHOP	0
-#define WISE_PAWN	0
+// macros that toggles wisdom
+#define WISE_KING       1
+#define WISE_QUEEN      0
+#define WISE_ROOK       0
+#define WISE_KNIGHT     0
+#define WISE_BISHOP     0
+#define WISE_PAWN       0
 
 int board[BOARD_SIZE][BOARD_SIZE]; /* Board representation, white as positive, black as negative, blanks with zeroes */
 
 typedef struct node {
-  /* Please note the structure is used differently for moves and dangers list */
+  /* Please note the structure is used differently for moves and dangers lists */
   int piece;
   int from_row;
   int from_column;
@@ -59,22 +59,117 @@ typedef struct node {
 move *moves = NULL, *dangers = NULL;
 
 /*
-  Note.
-  1. A function to remove unsafe moves from 'moves' list
-  
-  Some documentation goes here.
 
-  Note.
-  KING.   Allowed to move one step in eight directions.
-  QUEEN.  Allowed to move infinty steps in eight directions.
-  ROOK.   Allowed to move infinty steps in four straight directions.
-  BISHOP. Allowed to move infinty steps in four diagonal directions.
-  KNIGHT. Allowed to move one step in eight strange directions.
-  PAWN.   Allowed to move one step forward in three directions.
-   
+  This is the documentation for the chess engine your are seeing right now, by its author Rajat Pundir.
+
+  Here is a list of global variables and what they do:
+  A. board
+  this is a global 2D Array, used to represent our chess board.
+  B. move *moves
+  this is a global pointer to a list which will store moves of a piece from some (row, column) to some (row, column).
+  C. move *dangers
+  this is a global pointer to a list which will store dangers arising from some (row, column) to piece at (row, column).
+  
+  Here is a list of macros and what they do:
+  1. KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN
+	these macros are used to define values of various pieces, white will have a positive sign, while black pieces will have a negative sign.
+  2. NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST
+	these macros are used to define values of various directions.
+  3. INVALID, BOARD_SIZE, BLANK
+	these macros are used to define values for representing Invalid squares, Blank squares, and Board Size.
+  4. SHOW_VALUES
+	toggles between display of Board with raw form or pretty printed values.
+  5. SHOW_FEN
+	toggles display of read FEN notation from stdin.
+  6. SHOW_KILL
+	toggles display of pretty printed moves and kills, according to moves list.
+  7. MOVES_MODE
+	toggles between display of moves as raw form or pretty printed form.
+  8. DANGERS_MODE
+	toggles between display of dangers as raw form or pretty printed form.
+  9. DANGERS_HELP
+	toggles display of dangers with high verbosity.
+  10. SHOW_HARM
+	toggles display of pretty printed dangers, according to dangers list.
+  11. WISE_KING, WISE_QUEEN, WISE_ROOK, WISE_KNIGHT, WISE_BISHOP, WISE_PAWN
+	these macros are used to toggle danger awareness of various pieces, King piece should always have danger awareness.
+
+  Here is a list of functions and what they do:
+  1. initialise_board
+  used to initialise board with a two layers of INVALID and rest with BLANK.
+  2. char pretty_print
+  this return character corresponding to a piece.
+  3. char* pretty_print_full_name
+  this returns full name of a piece.
+  4. int is_in_moves_list
+  returns count of moves in global moves list.
+  5. int is_in_dangers_list
+  returns count of moves in global dangers list.
+  6. show_board
+  this shows the board on the stdout, this is highly configurable using macros provided.
+  7. read_fen
+  this reads FEN notation from stdin, and prepares the board.
+  8. int sign_of_piece
+  returns 1 if piece is White or positively represented, otherwise returns -1.
+  9. clear_moves
+  clears moves list.
+  10. clear_dangers
+  clears dangers list.
+  11. translate_move
+  prints move, configurable with macros.
+  12. translate_danger
+  prints danger, configurable with macros.
+  13. show_moves
+  lists moves from moves list.
+  14. show_dangers
+  lists dangers from dangers list.
+  15. push_move
+  pushes move onto moves list.
+  16. push_danger
+  pushes danger onto dangers list.
+  17. change_row_column
+  used to change row and column according to some particular direction.
+  18. move_in_direction
+  pushes moves until it hits something in some particular direction.
+  19. move_diagonally
+  used to push valid moves in diagonal directions.
+  20. move_straight
+  used to push valid moves in straight directions.
+  21. move_in_direction_of_danger
+  pushes dangers for a piece until it hits something in some particular direction.
+  22. danger_by_row_column
+  pushes dangers from various directions, and also detects dangers from knights.
+  23. remove_unsafe_moves
+  removes those moves from moves list which are not safe.
+  24. moves_of_pawn
+  used to push moves onto moves list that a pawn at (row, column) can make.
+  25. moves_of_bishop
+  used to push moves onto moves list that a bishop at (row, column) can make.
+  26. moves_of_knight
+  used to push moves onto moves list that a knight at (row, column) can make.
+  27. moves_of_rook
+  used to push moves onto moves list that a rook at (row, column) can make.
+  28. moves_of_queen
+  used to push moves onto moves list that a queen at (row, column) can make.
+  29. moves_of_king
+  used to push moves onto moves list that a king at (row, column) can make, enable WISE_KING macro for normal play.
+  30. move_by_row_column
+  shows moves of piece at (row, column).
+  31. set_row_column_by_notation
+  sets row and column according to chess notation.
+  32. move_by_notation
+  shows moves of piece at some (row, column) according to chess notation.
+  33. danger_by_notation
+  shows dangers of piece at some (row, column) according to chess notation.
+  34. danger_on_oneself
+  shows dangers of piece at some (row, column), piece is automatically detected.
+  35. danger_on_oneself_by_notation
+  shows dangers of piece at some (row, column) according to chess notation, piece is automatically detected.
+
 */
 
 void initialise_board() {
+  // used to initialise board with a two layers of INVALID and rest with BLANK.
   for(int i = 0; i < BOARD_SIZE; i++) {
     for(int j = 0; j < BOARD_SIZE; j++) {
       if(i == 0 || i == 1 || j ==0 || j == 1 || i == (BOARD_SIZE - 2) || j == (BOARD_SIZE - 2) || i == (BOARD_SIZE - 1) || j == (BOARD_SIZE - 1))
@@ -86,44 +181,47 @@ void initialise_board() {
 }
 
 char pretty_print(int piece) {
+  // this return character corresponding to a piece.
   switch(piece) {
-  case INVALID:		return 'X';
-  case BLANK:		return '`';
-  case PAWN:		return 'P';
-  case BISHOP:		return 'B';
-  case KNIGHT:		return 'N';
-  case ROOK:		return 'R';
-  case QUEEN:		return 'Q';
-  case KING:		return 'K';
-  case -PAWN:		return 'p';
-  case -BISHOP:		return 'b';
-  case -KNIGHT:		return 'n';
-  case -ROOK:		return 'r';
-  case -QUEEN:       	return 'q';
-  case -KING:		return 'k';
+  case INVALID:         return 'X';
+  case BLANK:           return '`';
+  case PAWN:            return 'P';
+  case BISHOP:          return 'B';
+  case KNIGHT:          return 'N';
+  case ROOK:            return 'R';
+  case QUEEN:           return 'Q';
+  case KING:            return 'K';
+  case -PAWN:           return 'p';
+  case -BISHOP:         return 'b';
+  case -KNIGHT:         return 'n';
+  case -ROOK:           return 'r';
+  case -QUEEN:          return 'q';
+  case -KING:           return 'k';
   }
 }
 
 char* pretty_print_full_name(int piece) {
+  // this returns full name of a piece.
   switch(piece) {
-  case INVALID:		return "Invalid";
-  case BLANK:		return "Blank";
-  case PAWN:		return "White Pawn";
-  case BISHOP:		return "White Bishop";
-  case KNIGHT:		return "White Knight";
-  case ROOK:		return "White Rook";
-  case QUEEN:		return "White Queen";
-  case KING:		return "White King";
-  case -PAWN:		return "Black Pawn";
-  case -BISHOP:		return "Black Bishop";
-  case -KNIGHT:		return "Black Knight";
-  case -ROOK:		return "Black Rook";
-  case -QUEEN:       	return "Black Queen";
-  case -KING:		return "Black King";
+  case INVALID:         return "Invalid";
+  case BLANK:           return "Blank";
+  case PAWN:            return "White Pawn";
+  case BISHOP:          return "White Bishop";
+  case KNIGHT:          return "White Knight";
+  case ROOK:            return "White Rook";
+  case QUEEN:           return "White Queen";
+  case KING:            return "White King";
+  case -PAWN:           return "Black Pawn";
+  case -BISHOP:         return "Black Bishop";
+  case -KNIGHT:         return "Black Knight";
+  case -ROOK:           return "Black Rook";
+  case -QUEEN:          return "Black Queen";
+  case -KING:           return "Black King";
   }
 }
 
 int is_in_moves_list(int rownum, int colnum) {
+  // returns count of moves in global moves list.
   move *temp = moves;
   while(temp != NULL) {
     if(temp -> to_row == rownum && temp -> to_column == colnum)
@@ -134,6 +232,7 @@ int is_in_moves_list(int rownum, int colnum) {
 }
 
 int is_in_dangers_list(int rownum, int colnum) {
+  // returns count of moves in global dangers list.
   move *temp = dangers;
   while(temp != NULL) {
     if(temp -> from_row == rownum && temp -> from_column == colnum)
@@ -144,6 +243,7 @@ int is_in_dangers_list(int rownum, int colnum) {
 }
 
 void show_board() {
+  // this shows the board on the stdout, this is highly configurable using macros provided.
   if (SHOW_VALUES) {
     printf("\n");
     for(int i = 0; i < BOARD_SIZE; i++) {
@@ -236,6 +336,7 @@ void show_board() {
 }
 
 void read_fen() {
+  // this reads FEN notation from stdin, and prepares the board.
   char str[75];
   fgets(str, 75, stdin);
   if(SHOW_FEN) {
@@ -290,12 +391,14 @@ void read_fen() {
 }
 
 int sign_of_piece(int piece) {
+  // returns 1 if piece is White or positively represented, otherwise returns -1.
   if(piece > 0)
     return 1;
   return -1;
 }
 
 void clear_moves() {
+  // clears moves list.
   move *temp = NULL;
   while(moves != NULL) {
     temp = moves;
@@ -305,6 +408,7 @@ void clear_moves() {
 }
 
 void clear_dangers() {
+  // clears dangers list.
   move *temp = NULL;
   while(dangers != NULL) {
     temp = dangers;
@@ -314,20 +418,23 @@ void clear_dangers() {
 }
 
 void translate_move(int piece, int from_row, int from_column, int to_row, int to_column) {
-  if(MOVES_MODE)		/* macro toggles way of displaying moves */
+  // prints move, configurable with macros.
+  if(MOVES_MODE)                /* macro toggles way of displaying moves */
     printf("%c%c%d-%c%c%d ", pretty_print(piece), from_column + 95, (BOARD_SIZE - 2) - from_row, pretty_print(piece), to_column + 95, (BOARD_SIZE - 2) - to_row);
   else
     printf("r%d-c%d ", to_row, to_column);
 }
 
 void translate_danger(int piece, int from_row, int from_column, int to_row, int to_column) {
-  if(DANGERS_MODE)		/* macro toggles way of displaying dangers */
+  // prints danger, configurable with macros.
+  if(DANGERS_MODE)              /* macro toggles way of displaying dangers */
     printf("%c%c%d-%c%c%d ", pretty_print(piece), from_column + 95, (BOARD_SIZE - 2) - from_row, pretty_print(piece), to_column + 95, (BOARD_SIZE - 2) - to_row);
   else
     printf("r%d-c%d -> r%dc%d ", from_row, from_column, to_row, to_column);
 }
 
 void show_moves() {
+  // lists moves from moves list.
   move *temp = moves;
   if(temp != NULL)
     printf("\nmoves: ");
@@ -338,6 +445,7 @@ void show_moves() {
 }
 
 void show_dangers() {
+  // lists dangers from dangers list.
   move *temp = dangers;
   if(temp != NULL)
     printf("\ndangers: ");
@@ -359,6 +467,7 @@ void show_dangers() {
 }
 
 void push_move(int piece, int from_rownum, int from_colnum, int to_rownum, int to_colnum) {
+  // pushes move onto moves list.
   if (board[to_rownum][to_colnum] == INVALID)
     return; // discard invalid moves
   if (from_rownum < 2 || from_rownum > (BOARD_SIZE - 3) || from_colnum < 2 || from_colnum > (BOARD_SIZE - 3))
@@ -376,6 +485,7 @@ void push_move(int piece, int from_rownum, int from_colnum, int to_rownum, int t
 }
 
 void push_danger(int piece, int from_rownum, int from_colnum, int to_rownum, int to_colnum) {
+  // pushes danger onto dangers list.
   if (board[to_rownum][to_colnum] == INVALID) // discard invalid dangers
     return;
   move *temp = (move *)malloc(sizeof(move));
@@ -389,6 +499,7 @@ void push_danger(int piece, int from_rownum, int from_colnum, int to_rownum, int
 }
 
 void change_row_column(int *row, int *column, int *direction) {
+  // used to change row and column according to some particular direction.
   switch(*direction) {
   case NORTH: (*row)--;
     break;
@@ -410,32 +521,32 @@ void change_row_column(int *row, int *column, int *direction) {
 }
 
 void move_in_direction(int row, int column, int direction) {
-  // This function is designed to be used for bishops, rooks and queens.
+  // pushes moves until it hits something in some particular direction.
   int piece = board[row][column], from_row = row, from_column = column;
-  if(board[row][column] > 0) {	// if piece is white
+  if(board[row][column] > 0) {  // if piece is white
     while(board[row][column] != INVALID) {
       change_row_column(&row, &column, &direction); // move to next position
-      if(board[row][column] > 0)	// break if piece was of same color
+      if(board[row][column] > 0)        // break if piece was of same color
 	break;
       push_move(piece, from_row, from_column, row, column);
-      if(board[row][column] < 0)	// break if piece was of opposite color
+      if(board[row][column] < 0)        // break if piece was of opposite color
 	break;
     }
   }
   else if(board[row][column] < 0) {     // else piece is black
     while(board[row][column] != INVALID) {
       change_row_column(&row, &column, &direction); // move to next position
-      if(board[row][column] < 0)	// break if piece was of same color
+      if(board[row][column] < 0)        // break if piece was of same color
 	break;
       push_move(piece, from_row, from_column, row, column);
-      if(board[row][column] > 0)	// break if piece was of opposite color
+      if(board[row][column] > 0)        // break if piece was of opposite color
 	break;
     }
   }
 }
 
 void move_diagonally(int row, int column) {
-  // This function is designed to be used for bishops and queens.
+  // used to push valid moves in diagonal directions.
   move_in_direction(row, column, NORTH_EAST);
   move_in_direction(row, column, SOUTH_EAST);
   move_in_direction(row, column, SOUTH_WEST);
@@ -443,7 +554,7 @@ void move_diagonally(int row, int column) {
 }
 
 void move_straight(int row, int column) {
-  // This function is designed to be used for rooks and queens.
+  // used to push valid moves in straight directions.
   move_in_direction(row, column, NORTH);
   move_in_direction(row, column, EAST);
   move_in_direction(row, column, SOUTH);
@@ -451,14 +562,14 @@ void move_straight(int row, int column) {
 }
 
 void move_in_direction_of_danger(int piece, int row, int column, int direction) {
-  // This function is designed to detect dangers from enemy king, bishops, rooks and queens.
+  // pushes dangers for a piece until it hits something in some particular direction.
   int to_row = row, to_column = column;
-  if(piece > 0) {	// if piece is white
+  if(piece > 0) {       // if piece is white
     while(board[row][column] != INVALID) {
       change_row_column(&row, &column, &direction); // move to next position
-      if(board[row][column] > 0)	// break if piece at (row, column) is blocking dangers
+      if(board[row][column] > 0)        // break if piece at (row, column) is blocking dangers
 	break;
-      if(board[row][column] < 0) {	// break after pushing danger
+      if(board[row][column] < 0) {      // break after pushing danger
 	switch(direction) {
 	case NORTH:
 	case SOUTH:
@@ -498,15 +609,15 @@ void move_in_direction_of_danger(int piece, int row, int column, int direction) 
 	    case SOUTH_EAST:
 	    case SOUTH_WEST:
 	      if(board[row][column] == -KING)
-	        if(abs(row - to_row) == 1 && abs(column - to_column) == 1)
-		  push_danger(board[row][column], row, column, to_row, to_column);	  
+		if(abs(row - to_row) == 1 && abs(column - to_column) == 1)
+		  push_danger(board[row][column], row, column, to_row, to_column);
 	      break;
 	      // North-East and North-West options are valid only for White pieces.
 	      // Options for Black pieces will be South-East and South-West.
 	    case NORTH_EAST:
 	    case NORTH_WEST:
 	      if(abs(row - to_row) == 1 && abs(column - to_column) == 1)
-		push_danger(board[row][column], row, column, to_row, to_column);	  
+		push_danger(board[row][column], row, column, to_row, to_column);
 	      break;
 	    }
 	    break;
@@ -517,16 +628,16 @@ void move_in_direction_of_danger(int piece, int row, int column, int direction) 
 	  }
 	  break;
 	}
-	break;			/* break after pushing danger */
+	break;                  /* break after pushing danger */
       }
     }
   }
   else if(piece < 0) {     // else piece is black
     while(board[row][column] != INVALID) {
       change_row_column(&row, &column, &direction); // move to next position
-      if(board[row][column] < 0)	// break if piece at (row, column) is blocking dangers
+      if(board[row][column] < 0)        // break if piece at (row, column) is blocking dangers
 	break;
-      if(board[row][column] > 0) {	// break after pushing danger
+      if(board[row][column] > 0) {      // break after pushing danger
 	switch(direction) {
 	case NORTH:
 	case SOUTH:
@@ -566,15 +677,15 @@ void move_in_direction_of_danger(int piece, int row, int column, int direction) 
 	    case NORTH_EAST:
 	    case NORTH_WEST:
 	      if(board[row][column] == KING)
-	        if(abs(row - to_row) == 1 && abs(column - to_column) == 1)
-		  push_danger(board[row][column], row, column, to_row, to_column);	  
+		if(abs(row - to_row) == 1 && abs(column - to_column) == 1)
+		  push_danger(board[row][column], row, column, to_row, to_column);
 	      break;
 	      // South-East and South-West options are valid only for Black pieces.
 	      // Options for White pieces will be North-East and North-West.
 	    case SOUTH_EAST:
 	    case SOUTH_WEST:
 	      if(abs(row - to_row) == 1 && abs(column - to_column) == 1)
-		push_danger(board[row][column], row, column, to_row, to_column);	  
+		push_danger(board[row][column], row, column, to_row, to_column);
 	      break;
 	    }
 	    break;
@@ -585,14 +696,14 @@ void move_in_direction_of_danger(int piece, int row, int column, int direction) 
 	  }
 	  break;
 	}
-	break;			/* break after pushing danger */
+	break;                  /* break after pushing danger */
       }
     }
   }
 }
 
 void danger_by_row_column(int piece, int row, int column) {
-  // initialises linked list pointer 'dangers' with list of dangers that await for 'piece' which is at (row, column)
+  // pushes dangers from various directions, and also detects dangers from knights.
   clear_dangers();
   // dangers from enemy king, rooks, bishops, queens, and pawns.
   move_in_direction_of_danger(piece, row, column, NORTH);
@@ -604,7 +715,7 @@ void danger_by_row_column(int piece, int row, int column) {
   move_in_direction_of_danger(piece, row, column, NORTH_WEST);
   move_in_direction_of_danger(piece, row, column, SOUTH_WEST);
   // dangers from enemy knight
-  if(piece > 0) {	      // if piece is white
+  if(piece > 0) {             // if piece is white
     if(board[row - 1][column - 2] == -KNIGHT)
       push_danger(-KNIGHT, row - 1, column - 2, row, column);
     if(board[row - 1][column + 2] == -KNIGHT)
@@ -622,7 +733,7 @@ void danger_by_row_column(int piece, int row, int column) {
     if(board[row + 2][column + 1] == -KNIGHT)
       push_danger(-KNIGHT, row + 2, column + 1, row, column);
   }
-  else if(piece < 0) {	      // else piece is black
+  else if(piece < 0) {        // else piece is black
     if(board[row - 1][column - 2] == KNIGHT)
       push_danger(KNIGHT, row - 1, column - 2, row, column);
     if(board[row - 1][column + 2] == KNIGHT)
@@ -643,7 +754,7 @@ void danger_by_row_column(int piece, int row, int column) {
 }
 
 void remove_unsafe_moves() {
-  /* this function removes moves from the 'moves' list that are unsafe for the pieces in that list */
+  // removes those moves from moves list which are not safe.
   move *temp = moves, *safe_moves = NULL;
   while(temp != NULL) {
     board[(temp -> from_row)][(temp -> from_column)] = BLANK;
@@ -651,13 +762,13 @@ void remove_unsafe_moves() {
     if(dangers == NULL) {
       // move is safe from enemy pieces, push it to 'safe_moves' list
       move *safe_temp = (move *)malloc(sizeof(move));
-      safe_temp -> piece       =	temp -> piece;
-      safe_temp -> from_row    =	temp -> from_row;
-      safe_temp -> from_column =	temp -> from_column;
-      safe_temp -> to_row      =	temp -> to_row;
-      safe_temp -> to_column   =	temp -> to_column;
-      safe_temp -> next	       =	safe_moves;
-      safe_moves	       =	safe_temp;
+      safe_temp -> piece       =        temp -> piece;
+      safe_temp -> from_row    =        temp -> from_row;
+      safe_temp -> from_column =        temp -> from_column;
+      safe_temp -> to_row      =        temp -> to_row;
+      safe_temp -> to_column   =        temp -> to_column;
+      safe_temp -> next        =        safe_moves;
+      safe_moves               =        safe_temp;
     }
     board[temp -> from_row][temp -> from_column] = temp -> piece;
     temp = temp -> next;
@@ -667,10 +778,10 @@ void remove_unsafe_moves() {
 }
 
 void moves_of_pawn(int row, int column) {
-  // initialises linked list pointer 'moves' with list of moves that the pawn at (row,column) can make.
+  // used to push moves onto moves list that a pawn at (row, column) can make.
   clear_moves();
-  if(board[row][column] > 0) {	// if piece is white
-    if(board[row - 1][column] == BLANK) 
+  if(board[row][column] > 0) {  // if piece is white
+    if(board[row - 1][column] == BLANK)
       push_move(PAWN, row, column, row - 1, column);
     if(row == 8 && board[row - 2][column] == BLANK) /* initial case for a pawn */
       push_move(PAWN, row, column, row - 2, column);
@@ -679,7 +790,7 @@ void moves_of_pawn(int row, int column) {
     if(board[row - 1][column + 1] < 0  && board[row - 1][column + 1] != BLANK)
       push_move(PAWN, row, column, row - 1, column + 1);
   }
-  else if(board[row][column] < 0) {			// else piece is black
+  else if(board[row][column] < 0) {                     // else piece is black
     if(board[row + 1][column] == BLANK)
       push_move(-PAWN, row, column, row + 1, column);
     if(row == 3 && board[row + 2][column] == BLANK) /* initial case for a pawn */
@@ -694,7 +805,7 @@ void moves_of_pawn(int row, int column) {
 }
 
 void moves_of_bishop(int row, int column) {
-  // initialises linked list pointer 'moves' with list of moves that the bishop at (row,column) can make.
+  // used to push moves onto moves list that a bishop at (row, column) can make.
   clear_moves();
   move_diagonally(row, column);
   if(WISE_BISHOP)
@@ -702,7 +813,7 @@ void moves_of_bishop(int row, int column) {
 }
 
 void moves_of_knight(int row, int column) {
-  // initialises linked list pointer 'moves' with list of moves that the knight at (row,column) can make.
+  // used to push moves onto moves list that a knight at (row, column) can make.
   clear_moves();
   int sign_of_knight = sign_of_piece(board[row][column]);
   if(board[row - 1][column - 2] == BLANK || sign_of_piece(board[row - 1][column - 2]) != sign_of_knight)
@@ -726,7 +837,7 @@ void moves_of_knight(int row, int column) {
 }
 
 void moves_of_rook(int row, int column) {
-  // initialises linked list pointer 'moves' with list of moves that the rook at (row,column) can make.
+  // used to push moves onto moves list that a rook at (row, column) can make.
   clear_moves();
   move_straight(row, column);
   if(WISE_ROOK)
@@ -734,16 +845,16 @@ void moves_of_rook(int row, int column) {
 }
 
 void moves_of_queen(int row, int column) {
-  // initialises linked list pointer 'moves' with list of moves that the queen at (row,column) can make.
+  // used to push moves onto moves list that a queen at (row, column) can make.
   clear_moves();
   move_diagonally(row, column);
-  move_straight(row, column);  
+  move_straight(row, column);
   if(WISE_QUEEN)
     remove_unsafe_moves();
 }
 
 void moves_of_king(int row, int column) {
-  // initialises linked list pointer 'moves' with list of moves that the king at (row,column) can make.
+  //  used to push moves onto moves list that a king at (row, column) can make, enable WISE_KING macro for normal play.
   clear_moves();
   int sign_of_king = sign_of_piece(board[row][column]);
   if(board[row - 1][column] == BLANK || sign_of_piece(board[row - 1][column]) != sign_of_king)
@@ -762,11 +873,12 @@ void moves_of_king(int row, int column) {
     push_move(sign_of_king * KING, row, column, row + 1, column - 1);
   if(board[row + 1][column + 1] == sign_of_piece(BLANK || board[row + 1][column + 1]) != sign_of_king)
     push_move(sign_of_king * KING, row, column, row + 1, column + 1);
-  if(WISE_KING)			/* this must be on for normal gameplay */
+  if(WISE_KING)                 /* this must be on for normal game-play */
     remove_unsafe_moves();
 }
 
 void move_by_row_column (int row, int column) {
+  // shows moves of piece at (row, column).
   switch(board[row][column]) {
   case PAWN:
   case -PAWN:
@@ -796,6 +908,7 @@ void move_by_row_column (int row, int column) {
 }
 
 void set_row_column_by_notation(char *str, int *row, int *column) {
+  // sets row and column according to chess notation.
   switch(str[0]) {
   case 'a':
   case 'A':
@@ -837,6 +950,7 @@ void set_row_column_by_notation(char *str, int *row, int *column) {
 }
 
 void move_by_notation(char *str) {
+  // shows moves of piece at some (row, column) according to chess notation.
   int row = 0, column = 0;
   set_row_column_by_notation(str, &row, &column);
   if(row != 0 && column != 0)
@@ -844,6 +958,7 @@ void move_by_notation(char *str) {
 }
 
 void danger_by_notation(int piece, char *str) {
+  // shows dangers of piece at some (row, column) according to chess notation.
   int row = 0, column = 0;
   set_row_column_by_notation(str, &row, &column);
   if(row != 0 && column != 0)
@@ -851,15 +966,18 @@ void danger_by_notation(int piece, char *str) {
 }
 
 void danger_on_oneself(int row, int column) {
+  // shows dangers of piece at some (row, column), piece is automatically detected.
   danger_by_row_column(board[row][column], row, column);
 }
 
 void danger_on_oneself_by_notation(char *str) {
+  // shows dangers of piece at some (row, column) according to chess notation, piece is automatically detected.
   int row = 0, column = 0;
   set_row_column_by_notation(str, &row, &column);
   if(row != 0 && column != 0)
     danger_on_oneself(row, column);
 }
+
 
 int main() {
   freopen("input.txt", "r", stdin);
@@ -872,8 +990,11 @@ int main() {
 
   danger_on_oneself_by_notation(str);
   show_dangers();
-  
+
   show_board();
   return 1;
 }
+
+
+
 

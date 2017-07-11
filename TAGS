@@ -1,5 +1,5 @@
 
-chess.c,1935
+chess.c,2153
 #define KING	8,139
 #define QUEEN	9,155
 #define ROOK	10,171
@@ -18,57 +18,64 @@ chess.c,1935
 #define BOARD_SIZE	27,466
 #define BLANK	28,488
 #define SHOW_VALUES	31,536
-#define SHOW_FEN	32,558
-#define SHOW_KILL	33,577
-#define MOVES_MODE	34,597
-#define DANGERS_MODE	35,618
-#define DANGERS_HELP	36,641
-#define SHOW_HARM	37,664
-#define WISE_KING	38,684
-int board[board40,705
-typedef struct node 42,826
-  int piece;44,929
-  int from_row;45,942
-  int from_column;46,958
-  int to_row;47,977
-  int to_column;48,991
-  struct node *next;next49,1008
-}move;move50,1029
-move *moves moves52,1037
-void initialise_board(70,1606
-char pretty_print(81,1930
-char* pretty_print_full_name(100,2376
-int is_in_moves_list(119,2961
-int is_in_dangers_list(129,3178
-void show_board(139,3403
-void read_fen(231,5717
-void clear_moves(285,6930
-void clear_dangers(294,7065
-void translate_move(303,7210
-void translate_danger(310,7578
-void show_moves(317,7985
-void show_dangers(327,8236
-void push_move(348,8895
-void push_danger(361,9317
-void change_row_column(374,9747
-void move_in_direction(395,10197
-void move_diagonally(420,11217
-void move_straight(428,11514
-void move_in_direction_of_danger(436,11785
-void danger_by_row_column(577,15928
-void moves_of_pawn(628,18529
-void moves_of_bishop(653,19818
-void moves_of_knight(659,20020
-void moves_of_rook(700,22535
-void moves_of_queen(706,22731
-void moves_of_king(713,22963
-void move_by_row_column 870,28313
-void set_row_column_by_notation(899,28834
-void move_by_notation(940,29444
-void danger_by_notation(947,29626
-void danger_on_oneself(954,29830
-void danger_on_oneself_by_notation(958,29936
-int main(965,30130
+#define SHOW_FEN 32,558
+#define SHOW_KILL 33,584
+#define MOVES_MODE 34,610
+#define DANGERS_MODE 35,636
+#define DANGERS_HELP 36,662
+#define SHOW_HARM 37,688
+#define WISE_KING 40,745
+#define WISE_QUEEN 41,771
+#define WISE_ROOK 42,797
+#define WISE_KNIGHT 43,823
+#define WISE_BISHOP 44,849
+#define WISE_PAWN 45,875
+int board[board47,902
+typedef struct node 49,1023
+  int piece;51,1127
+  int from_row;52,1140
+  int from_column;53,1156
+  int to_row;54,1175
+  int to_column;55,1189
+  struct node *next;next56,1206
+}move;move57,1227
+move *moves moves59,1235
+void initialise_board(171,6074
+char pretty_print(183,6478
+char* pretty_print_full_name(203,7091
+int is_in_moves_list(223,7830
+int is_in_dangers_list(234,8097
+void show_board(245,8374
+void read_fen(338,10780
+int sign_of_piece(393,12059
+void clear_moves(400,12218
+void clear_dangers(410,12377
+void translate_move(420,12548
+void translate_danger(428,12974
+void show_moves(436,13439
+void show_dangers(447,13724
+void push_move(469,14421
+void push_danger(487,15163
+void change_row_column(501,15631
+void move_in_direction(523,16156
+void move_diagonally(548,17204
+void move_straight(556,17489
+void move_in_direction_of_danger(564,17750
+void danger_by_row_column(705,21920
+void remove_unsafe_moves(756,24488
+void moves_of_pawn(780,25466
+void moves_of_bishop(807,26791
+void moves_of_knight(815,27013
+void moves_of_rook(839,28693
+void moves_of_queen(847,28907
+void moves_of_king(856,29156
+void move_by_row_column 880,30831
+void set_row_column_by_notation(910,31396
+void move_by_notation(952,32060
+void danger_by_notation(960,32319
+void danger_on_oneself(968,32602
+void danger_on_oneself_by_notation(973,32792
+int main(982,33099
 
 LICENSE.md,16
 Copyright 3,13
@@ -80,4 +87,4 @@ makefile~,0
 
 input.txt,0
 
-chess,0
+a.out,0
