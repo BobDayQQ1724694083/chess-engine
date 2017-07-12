@@ -1,6 +1,8 @@
-This is a relatively simple chess engine, with some quick and dirty functions to push pieces around the board.
-Someday, this chess engine might entertain the ideas of Deep Learning.
+***CHESS ENGINE***
 
-***There is further scope of improvement like: Castling, Stalemate, En Passant, and Checkmate.***
-***Further, pieces can be made wise in general, to not allow checkmate for their side, therefore all moves that allow your own side to be checkmated should discarded, for example, a piece cannot move if it puts its own king in check.***
-***But I leave these improvements for the hands of person who will need this chess engine to solve some chess problem.***
+This is a simple chess engine, with some quick and dirty functions to push pieces around the board.
+The main motivation behind building this library of chess functions is to use it for competetive programming.
+
+There is further scope of improvement like: detecting Stalemate, allow Castling and En Passant. You can fork this project and simulating a game from a PGN file.
+
+This project has already grown to be quite big with lots of functions, and is more than able to simulate any chess game. Growing this project any further would not serve the aim of this project, therefore I leave these improvements for the hands of person who will need this chess engine to solve some chess problem. Don't forget to send pull requests if you improve this chess engine further.
