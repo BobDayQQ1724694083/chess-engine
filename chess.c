@@ -37,7 +37,8 @@
 #define SHOW_HARM       1
 
 // macros that toggles wisdom
-#define WISE_KING       1
+#define PROTECT_KING	1
+#define WISE_KING       0
 #define WISE_QUEEN      0
 #define WISE_ROOK       0
 #define WISE_KNIGHT     0
@@ -60,13 +61,12 @@ move *moves = NULL, *dangers = NULL;
 
 /*
 
-  This is the documentation for the chess engine your are seeing right now, by its author Rajat Pundir.
-  It is a relatively simple chess engine, with some quick and dirty functions to push pieces around the board.
-  Someday, this chess engine might entertain the ideas of Deep Learning.
-
-  ***There is further scope of improvement like: Castling, Stalemate, En Passant, and Checkmate.***
-  ***Further, pieces can be made wise in general, to not allow checkmate for their side, therefore all moves that allow your own side to be checkmated should discarded, for example, a piece cannot move if it puts its own king in check.***
-  ***But I leave these improvements for the hands of person who will need this chess engine to solve some chess problem.***
+  ***CHESS ENGINE DOCUMENTATION***
+  This is the documentation for the chess engine that you are seeing right now, by its author Rajat Pundir.
+  This is a simple chess engine, with some quick and dirty functions to push pieces around the board.
+  The main motivation behind building this library of chess functions is to use it for competitive programming.
+  There is further scope of improvement like: detecting Stalemate, allow Castling and En Passant. You can fork this project and simulating a game from a PGN file.
+  This project has already grown to be quite big with lots of functions, and is more than able to simulate any chess game. Growing this project any further would not serve the aim of this project, therefore I leave these improvements for the hands of person who will need this chess engine to solve some chess problem. Don't forget to send pull requests if you improve this chess engine further.
 
 
   Here is a list of global variables and what they do:
@@ -79,27 +79,29 @@ move *moves = NULL, *dangers = NULL;
   
   Here is a list of macros and what they do:
   1. KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN
-	these macros are used to define values of various pieces, white will have a positive sign, while black pieces will have a negative sign.
+  these macros are used to define values of various pieces, white will have a positive sign, while black pieces will have a negative sign.
   2. NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST
-	these macros are used to define values of various directions.
+  these macros are used to define values of various directions.
   3. INVALID, BOARD_SIZE, BLANK
-	these macros are used to define values for representing Invalid squares, Blank squares, and Board Size.
+  these macros are used to define values for representing Invalid squares, Blank squares, and Board Size.
   4. SHOW_VALUES
-	toggles between display of Board with raw form or pretty printed values.
+  toggles between display of Board with raw form or pretty printed values.
   5. SHOW_FEN
-	toggles display of read FEN notation from stdin.
+  toggles display of read FEN notation from stdin.
   6. SHOW_KILL
-	toggles display of pretty printed moves and kills, according to moves list.
+  toggles display of pretty printed moves and kills, according to moves list.
   7. MOVES_MODE
-	toggles between display of moves as raw form or pretty printed form.
+  toggles between display of moves as raw form or pretty printed form.
   8. DANGERS_MODE
-	toggles between display of dangers as raw form or pretty printed form.
+  toggles between display of dangers as raw form or pretty printed form.
   9. DANGERS_HELP
-	toggles display of dangers with high verbosity.
+  toggles display of dangers with high verbosity.
   10. SHOW_HARM
-	toggles display of pretty printed dangers, according to dangers list.
+  toggles display of pretty printed dangers, according to dangers list.
+  11. PROTECT_KING
+  this macro gives smartness to pieces which avoids moves that will put king of their own side in dangerous position, always have this on for normal game-play.
   11. WISE_KING, WISE_QUEEN, WISE_ROOK, WISE_KNIGHT, WISE_BISHOP, WISE_PAWN
-	these macros are used to toggle danger awareness of various pieces, King piece should always have danger awareness.
+  these macros are used to toggle danger awareness of various pieces.
 
   Here is a list of functions and what they do:
   1. initialise_board
@@ -148,29 +150,33 @@ move *moves = NULL, *dangers = NULL;
   pushes dangers from various directions, and also detects dangers from knights.
   23. remove_unsafe_moves
   removes those moves from moves list which are not safe.
-  24. moves_of_pawn
+  24. find_my_king
+  finds (row, column) of the king of the side to which piece belongs.
+  25. protect_king_by_removing_hidden_dangerous_moves
+  removes those invalid moves from moves list which are which puts king of the side to which piece belongs, in danger.
+  26. moves_of_pawn
   used to push moves onto moves list that a pawn at (row, column) can make.
-  25. moves_of_bishop
+  27. moves_of_bishop
   used to push moves onto moves list that a bishop at (row, column) can make.
-  26. moves_of_knight
+  28. moves_of_knight
   used to push moves onto moves list that a knight at (row, column) can make.
-  27. moves_of_rook
+  29. moves_of_rook
   used to push moves onto moves list that a rook at (row, column) can make.
-  28. moves_of_queen
+  30. moves_of_queen
   used to push moves onto moves list that a queen at (row, column) can make.
-  29. moves_of_king
-  used to push moves onto moves list that a king at (row, column) can make, enable WISE_KING macro for normal play.
-  30. move_by_row_column
+  31. moves_of_king
+  used to push moves onto moves list that a king at (row, column) can make.
+  32. move_by_row_column
   shows moves of piece at (row, column).
-  31. set_row_column_by_notation
+  33. set_row_column_by_notation
   sets row and column according to chess notation.
-  32. move_by_notation
+  34. move_by_notation
   shows moves of piece at some (row, column) according to chess notation.
-  33. danger_by_notation
+  35. danger_by_notation
   shows dangers of piece at some (row, column) according to chess notation.
-  34. danger_on_oneself
+  36. danger_on_oneself
   shows dangers of piece at some (row, column), piece is automatically detected.
-  35. danger_on_oneself_by_notation
+  37. danger_on_oneself_by_notation
   shows dangers of piece at some (row, column) according to chess notation, piece is automatically detected.
 
 */
@@ -722,23 +728,23 @@ void danger_by_row_column(int piece, int row, int column) {
   move_in_direction_of_danger(piece, row, column, NORTH_WEST);
   move_in_direction_of_danger(piece, row, column, SOUTH_WEST);
   // dangers from enemy knight
-  int sign = sign_of_piece(piece);
-  if(board[row - 1][column - 2] == (-1 * sign * KNIGHT))
-    push_danger(-1 * sign * KNIGHT, row - 1, column - 2, row, column);
-  if(board[row - 1][column + 2] == (-1 * sign * KNIGHT))
-    push_danger(-1 * sign * KNIGHT, row - 1, column + 2, row, column);
-  if(board[row - 2][column - 1] == (-1 * sign * KNIGHT))
-    push_danger(-1 * sign * KNIGHT, row - 2, column - 1, row, column);
-  if(board[row - 2][column + 1] == (-1 * sign * KNIGHT))
-    push_danger(-1 * sign * KNIGHT, row - 2, column + 1, row, column);
-  if(board[row + 1][column - 2] == (-1 * sign * KNIGHT))
-    push_danger(-1 * sign * KNIGHT, row + 1, column - 2, row, column);
-  if(board[row + 1][column + 2] == (-1 * sign * KNIGHT))
-    push_danger(-1 * sign * KNIGHT, row + 1, column + 2, row, column);
-  if(board[row + 2][column - 1] == (-1 * sign * KNIGHT))
-    push_danger(-1 * sign * KNIGHT, row + 2, column - 1, row, column);
-  if(board[row + 2][column + 1] == (-1 * sign * KNIGHT))
-    push_danger(-1 * sign * KNIGHT, row + 2, column + 1, row, column);
+  int sign_of_knight = sign_of_piece(piece);
+  if(board[row - 1][column - 2] == (-1 * sign_of_knight * KNIGHT))
+    push_danger(-1 * sign_of_knight * KNIGHT, row - 1, column - 2, row, column);
+  if(board[row - 1][column + 2] == (-1 * sign_of_knight * KNIGHT))
+    push_danger(-1 * sign_of_knight * KNIGHT, row - 1, column + 2, row, column);
+  if(board[row - 2][column - 1] == (-1 * sign_of_knight * KNIGHT))
+    push_danger(-1 * sign_of_knight * KNIGHT, row - 2, column - 1, row, column);
+  if(board[row - 2][column + 1] == (-1 * sign_of_knight * KNIGHT))
+    push_danger(-1 * sign_of_knight * KNIGHT, row - 2, column + 1, row, column);
+  if(board[row + 1][column - 2] == (-1 * sign_of_knight * KNIGHT))
+    push_danger(-1 * sign_of_knight * KNIGHT, row + 1, column - 2, row, column);
+  if(board[row + 1][column + 2] == (-1 * sign_of_knight * KNIGHT))
+    push_danger(-1 * sign_of_knight * KNIGHT, row + 1, column + 2, row, column);
+  if(board[row + 2][column - 1] == (-1 * sign_of_knight * KNIGHT))
+    push_danger(-1 * sign_of_knight * KNIGHT, row + 2, column - 1, row, column);
+  if(board[row + 2][column + 1] == (-1 * sign_of_knight * KNIGHT))
+    push_danger(-1 * sign_of_knight * KNIGHT, row + 2, column + 1, row, column);
 }
 
 void remove_unsafe_moves() {
@@ -759,6 +765,50 @@ void remove_unsafe_moves() {
       safe_moves               =        safe_temp;
     }
     board[temp -> from_row][temp -> from_column] = temp -> piece;
+    temp = temp -> next;
+  }
+  clear_moves();
+  moves = safe_moves;
+}
+
+void find_my_king(int piece, int *row_of_king, int *column_of_king) {
+  // finds (row, column) of the king of the side to which piece belongs.
+  int king = sign_of_piece(piece) * KING;
+  for (int i = 2; i  < (BOARD_SIZE - 2); i++ ) {
+    for (int j  = 2; j < (BOARD_SIZE - 2); j++ ) {
+      if(board[i][j] == king) {
+	*row_of_king = i;
+	*column_of_king = j;
+	return;
+      }
+    }
+  }
+}
+
+void protect_king_by_removing_hidden_dangerous_moves() {
+  // removes those invalid moves from moves list which are which puts king of the side to which piece belongs, in danger.
+  move *temp = moves, *safe_moves = NULL;
+  while(temp != NULL) {
+    /* ordering of statements is important here  */
+    int restore_piece = board[(temp -> to_row)][(temp -> to_column)];
+    board[(temp -> from_row)][(temp -> from_column)] = BLANK;
+    board[(temp -> to_row)][(temp -> to_column)] = temp -> piece;
+    int row_of_king = 0, column_of_king = 0;
+    find_my_king(temp -> piece, &row_of_king, &column_of_king);
+    danger_by_row_column(sign_of_piece(temp -> piece) * KING, row_of_king, column_of_king);
+    if(dangers == NULL) {
+      // move is safe from enemy pieces, push it to 'safe_moves' list
+      move *safe_temp = (move *)malloc(sizeof(move));
+      safe_temp -> piece       =        temp -> piece;
+      safe_temp -> from_row    =        temp -> from_row;
+      safe_temp -> from_column =        temp -> from_column;
+      safe_temp -> to_row      =        temp -> to_row;
+      safe_temp -> to_column   =        temp -> to_column;
+      safe_temp -> next        =        safe_moves;
+      safe_moves               =        safe_temp;
+    }
+    board[temp -> from_row][temp -> from_column] = temp -> piece;
+    board[(temp -> to_row)][(temp -> to_column)] = restore_piece;
     temp = temp -> next;
   }
   clear_moves();
@@ -788,6 +838,8 @@ void moves_of_pawn(int row, int column) {
     if(board[row + 1][column + 1] > 0 && board[row + 1][column + 1] != BLANK)
       push_move(-PAWN, row, column, row + 1, column + 1);
   }
+  if(PROTECT_KING)
+    protect_king_by_removing_hidden_dangerous_moves();
   if(WISE_PAWN)
     remove_unsafe_moves();
 }
@@ -796,6 +848,8 @@ void moves_of_bishop(int row, int column) {
   // used to push moves onto moves list that a bishop at (row, column) can make.
   clear_moves();
   move_diagonally(row, column);
+  if(PROTECT_KING)
+    protect_king_by_removing_hidden_dangerous_moves();
   if(WISE_BISHOP)
     remove_unsafe_moves();
 }
@@ -820,6 +874,8 @@ void moves_of_knight(int row, int column) {
     push_move(sign_of_knight * KNIGHT, row, column, row + 2, column - 1);
   if(board[row + 2][column + 1] == BLANK || sign_of_piece(board[row + 2][column + 1]) != sign_of_knight)
     push_move(sign_of_knight * KNIGHT, row, column, row + 2, column + 1);
+  if(PROTECT_KING)
+    protect_king_by_removing_hidden_dangerous_moves();
   if(WISE_KNIGHT)
     remove_unsafe_moves();
 }
@@ -828,6 +884,8 @@ void moves_of_rook(int row, int column) {
   // used to push moves onto moves list that a rook at (row, column) can make.
   clear_moves();
   move_straight(row, column);
+  if(PROTECT_KING)
+    protect_king_by_removing_hidden_dangerous_moves();
   if(WISE_ROOK)
     remove_unsafe_moves();
 }
@@ -837,12 +895,14 @@ void moves_of_queen(int row, int column) {
   clear_moves();
   move_diagonally(row, column);
   move_straight(row, column);
+  if(PROTECT_KING)
+    protect_king_by_removing_hidden_dangerous_moves();
   if(WISE_QUEEN)
     remove_unsafe_moves();
 }
 
 void moves_of_king(int row, int column) {
-  //  used to push moves onto moves list that a king at (row, column) can make, enable WISE_KING macro for normal play.
+  //  used to push moves onto moves list that a king at (row, column) can make.
   clear_moves();
   int sign_of_king = sign_of_piece(board[row][column]);
   if(board[row - 1][column] == BLANK || sign_of_piece(board[row - 1][column]) != sign_of_king)
@@ -861,6 +921,8 @@ void moves_of_king(int row, int column) {
     push_move(sign_of_king * KING, row, column, row + 1, column - 1);
   if(board[row + 1][column + 1] == sign_of_piece(BLANK || board[row + 1][column + 1]) != sign_of_king)
     push_move(sign_of_king * KING, row, column, row + 1, column + 1);
+  if(PROTECT_KING)
+    protect_king_by_removing_hidden_dangerous_moves();
   if(WISE_KING)                 /* this must be on for normal game-play */
     remove_unsafe_moves();
 }
